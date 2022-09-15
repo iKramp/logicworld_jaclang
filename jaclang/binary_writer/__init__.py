@@ -1,6 +1,7 @@
 import time
 import keyboard
 
+
 def writeBinary(binary_code):
     time.sleep(3)
 

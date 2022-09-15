@@ -21,7 +21,8 @@ def main():
     instructions = parser.parse(tokens)
     binary_code = generator.generate(instructions)"""
 
-    binary_code = [0b01010101, 0b00000010, 0b00000100, 0b00001000, 0b00010000, 0b00100000]
+    binary_code = [0b00001101, 0b00000000, 0b10101010, 0b00000000,
+                   0b00001101, 0b11111111, 0b01010101, 0b00000000]
     binary_writer.writeBinary(binary_code)
 
 
