@@ -18,11 +18,16 @@ def main():
 
     preprocessed_contents = preprocessor.preprocess(file_contents)
     tokens = lexer.tokenize(preprocessed_contents)
-    instructions = parser.parse(tokens)
-    binary_code = generator.generate(instructions)"""
+    instructions = parser.parse(tokens)"""
 
-    binary_code = [0b00001101, 0b00000000, 0b10101010, 0b00000000,
-                   0b00001101, 0b11111111, 0b01010101, 0b00000000]
+    instructions = [
+        generator.ImmediateInstruction(generator.REG0, 0b11011),
+        generator.ImmediateInstruction(generator.REG1, 0b00111),
+        generator.AddInstruction(generator.REG0, generator.REG1, generator.REG2),
+        generator.NopInstruction(),
+    ]
+    binary_code = generator.generate(instructions, True)
+
     binary_writer.writeBinary(binary_code)
 
 
