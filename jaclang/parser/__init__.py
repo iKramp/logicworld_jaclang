@@ -1,2 +1,2 @@
 def parse(param):
-    pass
+    return []

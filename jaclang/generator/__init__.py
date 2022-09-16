@@ -203,8 +203,11 @@ class RetInstruction(Instruction):
 
 def generate(instructions: list[Instruction], debug_output: bool = False):
     if debug_output:
+        print("Generated assembly code:")
+        print("---------------------------------")
         for instruction in instructions:
             instruction.printInfo()
+        print("---------------------------------")
     binary_code = []
     for instruction in instructions:
         binary_code += instruction.toBytes()

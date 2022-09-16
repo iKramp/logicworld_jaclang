@@ -1,2 +1,2 @@
 def tokenize(param):
-    pass
+    return []

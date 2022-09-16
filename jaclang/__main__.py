@@ -17,15 +17,15 @@ def main():
         file_contents = file.read()
 
     preprocessed_contents = preprocessor.preprocess(file_contents, True)
-    # tokens = lexer.tokenize(preprocessed_contents)
-    # instructions = parser.parse(tokens)
+    tokens = lexer.tokenize(preprocessed_contents)
+    instructions = parser.parse(tokens)
 
-    instructions = [
+    """instructions = [
         generator.ImmediateInstruction(generator.REG0, 0b11011),
         generator.ImmediateInstruction(generator.REG1, 0b00111),
         generator.AddInstruction(generator.REG0, generator.REG1, generator.REG2),
         generator.NopInstruction(),
-    ]
+    ]"""
     binary_code = generator.generate(instructions, True)
 
     print(f"Binary code size: {len(binary_code)} bytes")

@@ -10,6 +10,10 @@ func function(int g) {
 func/*hah h*/main() {
     var /*hah h*/a = 20
     function(10 +/*hah h*/ a)
-    return
+    return /* test comment
+} /* testing */
+
+test */
+
 }
 
