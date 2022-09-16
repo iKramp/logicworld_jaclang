@@ -15,5 +15,9 @@ func/*hah h*/main() {
 
 test */
 
+    if a == 10 {
+        function(10)
+    }
+
 }
 

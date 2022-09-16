@@ -17,8 +17,8 @@ def main():
         file_contents = file.read()
 
     preprocessed_contents = preprocessor.preprocess(file_contents, True)
-    tokens = lexer.tokenize(preprocessed_contents)
-    instructions = parser.parse(tokens)
+    tokens = lexer.tokenize(preprocessed_contents, True)
+    instructions = parser.parse(tokens, True)
 
     """instructions = [
         generator.ImmediateInstruction(generator.REG0, 0b11011),
