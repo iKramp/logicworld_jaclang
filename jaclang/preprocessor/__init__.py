@@ -1,4 +1,4 @@
-def removeSingleLineComments(code: str):
+def removeSingleLineComments(code: str) -> str:
     new_code = ""
     is_in_comment = False
     for i, c in enumerate(code):
@@ -14,7 +14,7 @@ def removeSingleLineComments(code: str):
     return new_code
 
 
-def removeMultilineComments(code: str):
+def removeMultilineComments(code: str) -> str:
     new_code = ""
     comment_nesting = 0
     for i, c in enumerate(code):
@@ -31,7 +31,7 @@ def removeMultilineComments(code: str):
     return new_code
 
 
-def preprocess(file_contents: str, debug_output: bool = False):
+def preprocess(file_contents: str, debug_output: bool = False) -> str:
     file_contents = removeSingleLineComments(file_contents)
     file_contents = removeMultilineComments(file_contents)
 

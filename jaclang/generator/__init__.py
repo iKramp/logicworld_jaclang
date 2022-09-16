@@ -201,7 +201,7 @@ class RetInstruction(Instruction):
         super().__init__("RET", 0b11000, [EmptyByteParameter()])
 
 
-def generate(instructions: list[Instruction], debug_output: bool = False):
+def generate(instructions: list[Instruction], debug_output: bool = False) -> list[int]:
     if debug_output:
         print("Generated assembly code:")
         print("---------------------------------")
