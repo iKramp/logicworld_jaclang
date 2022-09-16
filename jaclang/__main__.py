@@ -7,7 +7,7 @@ import binary_writer
 
 
 def main():
-    """if len(sys.argv) != 2:
+    if len(sys.argv) != 2:
         print("Usage: python3 -m jaclang [input_file]")
         return
 
@@ -16,9 +16,9 @@ def main():
     with open(input_file, "r") as file:
         file_contents = file.read()
 
-    preprocessed_contents = preprocessor.preprocess(file_contents)
-    tokens = lexer.tokenize(preprocessed_contents)
-    instructions = parser.parse(tokens)"""
+    preprocessed_contents = preprocessor.preprocess(file_contents, True)
+    # tokens = lexer.tokenize(preprocessed_contents)
+    # instructions = parser.parse(tokens)
 
     instructions = [
         generator.ImmediateInstruction(generator.REG0, 0b11011),
@@ -28,7 +28,9 @@ def main():
     ]
     binary_code = generator.generate(instructions, True)
 
-    binary_writer.writeBinary(binary_code)
+    print(f"Binary code size: {len(binary_code)} bytes")
+
+    # binary_writer.writeBinary(binary_code)
 
 
 main()
