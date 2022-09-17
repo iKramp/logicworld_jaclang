@@ -3,7 +3,7 @@
 this is a multiline comment
 */
 
-func function(int g) {
+func function(var g) {
     return 0 // asd
 }
 
