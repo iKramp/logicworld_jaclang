@@ -27,6 +27,14 @@ class IdentifierToken(Token):
         return f"ident: {self.identifier}"
 
 
+class ConstantToken(Token):
+    def __init__(self, value: int):
+        self.value = value
+
+    def getInfo(self) -> str:
+        return f"value: {self.value}"
+
+
 LEFT_BRACKET = SymbolToken("LEFT_BRACKET", "(")
 RIGHT_BRACKET = SymbolToken("RIGHT_BRACKET", ")")
 ASSIGNMENT = SymbolToken("ASSIGNMENT", "=")
@@ -63,7 +71,10 @@ def tokenize(code: str, debug_output: bool = False) -> list[Token]:
 
         if code[i] == ' ' or curr_symbol is not None:
             if curr_token != "":
-                new_token = IdentifierToken(curr_token)
+                if curr_token.isdigit():
+                    new_token = ConstantToken(int(curr_token))
+                else:
+                    new_token = IdentifierToken(curr_token)
                 curr_token = ""
                 tokens.append(new_token)
 
