@@ -1,10 +1,11 @@
 from jaclang.generator import Instruction
 from jaclang.lexer import Token
+from jaclang.parser.function import FunctionDeclarationBranch
 
 
 def parse(tokens: list[Token], debug_output: bool = False) -> list[Instruction]:
     branches = [
-
+        FunctionDeclarationBranch(),
     ]
 
     i = 0
