@@ -35,6 +35,17 @@ class ConstantToken(Token):
         return f"value: {self.value}"
 
 
+class KeywordToken(Token):
+    keywords = {}
+
+    def __init__(self, name: str, identifier: str):
+        self.name = name
+        KeywordToken.keywords[identifier] = self
+
+    def getInfo(self) -> str:
+        return self.name
+
+
 LEFT_BRACKET = SymbolToken("LEFT_BRACKET", "(")
 RIGHT_BRACKET = SymbolToken("RIGHT_BRACKET", ")")
 ASSIGNMENT = SymbolToken("ASSIGNMENT", "=")
@@ -57,6 +68,11 @@ DECREMENT = SymbolToken("DECREMENT", "--")
 INCREMENT_BY = SymbolToken("INCREMENT_BY", "+=")
 DECREMENT_BY = SymbolToken("DECREMENT_BY", "-=")
 
+FUNC_KEYWORD = KeywordToken("FUNC", "func")
+IF_KEYWORD = KeywordToken("IF", "if")
+WHILE_KEYWORD = KeywordToken("WHILE", "while")
+VAR_KEYWORD = KeywordToken("VAR", "var")
+
 
 def tokenize(code: str, debug_output: bool = False) -> list[Token]:
     tokens = []
@@ -73,6 +89,8 @@ def tokenize(code: str, debug_output: bool = False) -> list[Token]:
             if curr_token != "":
                 if curr_token.isdigit():
                     new_token = ConstantToken(int(curr_token))
+                elif curr_token in KeywordToken.keywords.keys():
+                    new_token = KeywordToken.keywords[curr_token]
                 else:
                     new_token = IdentifierToken(curr_token)
                 curr_token = ""

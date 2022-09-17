@@ -19,7 +19,7 @@ class BranchFactory:
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
         pass
 
-    def parse(self, pos: int, tokens: list[Token]) -> (int, Branch):
+    def parseExpect(self, pos: int, tokens: list[Token]) -> (int, Branch):
         try:
             return self.parseImpl(pos, tokens)
         except TokenExpectedException as exception:

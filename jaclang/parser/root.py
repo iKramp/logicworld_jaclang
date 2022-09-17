@@ -10,10 +10,11 @@ class RootBranch(Branch):
         self.functions = functions
 
     def printInfo(self, nested_level: int):
-        pass
+        for function in self.functions:
+            function.printInfo(nested_level)
 
     def generateInstructions(self) -> list[Instruction]:
-        pass
+        return []
 
 
 class RootFactory(BranchFactory):
@@ -21,7 +22,7 @@ class RootFactory(BranchFactory):
         function_factory = FunctionDeclarationFactory()
         functions = []
         while pos < len(tokens):
-            pos, function = function_factory.parseImpl(pos, tokens)
+            pos, function = function_factory.parseExpect(pos, tokens)
             functions.append(function)
 
         return pos, RootBranch(functions)
