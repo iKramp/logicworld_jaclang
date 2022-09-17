@@ -1,9 +1,9 @@
 import sys
-import preprocessor
-import lexer
-import parser
-import generator
-import binary_writer
+
+from jaclang.generator import generate
+from jaclang.lexer import tokenize
+from jaclang.parser import parse
+from jaclang.preprocessor import preprocess
 
 
 def main():
@@ -16,9 +16,9 @@ def main():
     with open(input_file, "r") as file:
         file_contents = file.read()
 
-    preprocessed_contents = preprocessor.preprocess(file_contents, True)
-    tokens = lexer.tokenize(preprocessed_contents, True)
-    instructions = parser.parse(tokens, True)
+    preprocessed_contents = preprocess(file_contents, True)
+    tokens = tokenize(preprocessed_contents, True)
+    instructions = parse(tokens, True)
 
     """instructions = [
         generator.ImmediateInstruction(generator.REG0, 0b11011),
@@ -26,7 +26,7 @@ def main():
         generator.AddInstruction(generator.REG0, generator.REG1, generator.REG2),
         generator.NopInstruction(),
     ]"""
-    binary_code = generator.generate(instructions, True)
+    binary_code = generate(instructions, True)
 
     print(f"Binary code size: {len(binary_code)} bytes")
 
