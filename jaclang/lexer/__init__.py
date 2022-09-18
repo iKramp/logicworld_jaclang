@@ -67,6 +67,8 @@ INCREMENT = SymbolToken("INCREMENT", "++")
 DECREMENT = SymbolToken("DECREMENT", "--")
 INCREMENT_BY = SymbolToken("INCREMENT_BY", "+=")
 DECREMENT_BY = SymbolToken("DECREMENT_BY", "-=")
+PLUS = SymbolToken("PLUS", "+")
+MINUS = SymbolToken("MINUS", "-")
 
 FUNC_KEYWORD = KeywordToken("FUNC", "func")
 IF_KEYWORD = KeywordToken("IF", "if")

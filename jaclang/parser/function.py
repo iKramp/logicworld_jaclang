@@ -11,8 +11,7 @@ class FunctionDeclarationBranch(Branch):
 
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, f"FunctionDeclaration:")
-        print('    ' * nested_level, f" name: {self.name}")
-        print('    ' * nested_level, f" body:")
+        print('    ' * nested_level, f"    name: {self.name}")
         self.body.printInfo(nested_level + 1)
 
     def generateInstructions(self) -> list[Instruction]:

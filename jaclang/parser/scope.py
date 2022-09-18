@@ -8,6 +8,7 @@ class ScopeBranch(Branch):
         self.branches = branches
 
     def printInfo(self, nested_level: int):
+        print('    ' * nested_level, "scope:")
         for branch in self.branches:
             branch.printInfo(nested_level + 1)
 
