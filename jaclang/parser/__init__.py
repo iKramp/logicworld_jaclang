@@ -1,7 +1,13 @@
 from jaclang.generator import Instruction
 from jaclang.lexer import Token
-from jaclang.parser.function import FunctionDeclarationBranch
 from jaclang.parser.root import RootFactory
+
+# modules
+from jaclang.parser import integer
+from jaclang.parser import function
+from jaclang.parser import scope
+from jaclang.parser import variable
+from jaclang.parser import expression
 
 
 def parse(tokens: list[Token], debug_output: bool = False) -> list[Instruction]:

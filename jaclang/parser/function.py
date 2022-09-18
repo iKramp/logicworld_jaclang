@@ -1,5 +1,6 @@
 from jaclang.generator import Instruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
+from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
 from jaclang.parser.scope import ScopeFactory, ScopeBranch
 
@@ -41,3 +42,6 @@ class FunctionDeclarationFactory(BranchFactory):
         pos, body = ScopeFactory().parseExpect(pos, tokens)
 
         return pos, FunctionDeclarationBranch(func_name, body)
+
+
+RootFactory.factories.append(FunctionDeclarationFactory())

@@ -29,7 +29,7 @@ class BranchFactory:
         try:
             return self.parseImpl(pos, tokens)
         except TokenExpectedException as _:
-            return (pos, None)
+            return pos, None
 
 
 # Parser did not recognize branch type (throws if you need to have a branch present somewhere)

@@ -3,8 +3,9 @@ from __future__ import annotations
 from abc import ABC
 
 from jaclang.generator import Instruction
-from jaclang.lexer import Token, PLUS, MINUS, SymbolToken, ConstantToken, UNKNOWN
+from jaclang.lexer import Token, PLUS, MINUS, SymbolToken, UNKNOWN
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException
+from jaclang.parser.scope import ScopeFactory
 
 
 class Operator:
@@ -24,33 +25,11 @@ class ValueBranch(Branch, ABC):
     pass
 
 
-class IntegerBranch(ValueBranch):
-    def __init__(self, value: int):
-        self.value = value
-
-    def printInfo(self, nested_level: int):
-        print('    ' * nested_level, self.value)
-
-    def generateInstructions(self) -> list[Instruction]:
-        pass
-
-
-class IntegerFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
-        if pos >= len(tokens) or type(tokens[pos]) is not ConstantToken:
-            raise TokenExpectedException("Expected integer")
-        value = tokens[pos].value
-        pos += 1
-        return pos, IntegerBranch(value)
-
-
 class ValueFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
-        factories = [
-            IntegerFactory(),
-        ]
+    factories = set()
 
-        for factory in factories:
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+        for factory in ValueFactory.factories:
             pos, value = factory.parseDontExpect(pos, tokens)
             if value is not None:
                 return pos, value
@@ -92,3 +71,5 @@ class ExpressionFactory(BranchFactory):
 
         return pos, ExpressionBranch(value, expr_operator, next_branch)
 
+
+ScopeFactory.factories.add(ExpressionFactory())
