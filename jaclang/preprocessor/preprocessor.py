@@ -27,7 +27,7 @@ def removeMultilineComments(code: str) -> str:
             if comment_nesting > 0:
                 comment_nesting -= 1
             else:
-                raise JaclangSyntaxError(0, "Closed unopened multiline comment")
+                raise JaclangSyntaxError(i - 2, "Closed unopened multiline comment")
 
         new_code += c if comment_nesting == 0 else " "
 
