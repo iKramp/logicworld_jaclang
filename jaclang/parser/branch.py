@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+from jaclang.error.syntaxError import JaclangSyntaxError
 from jaclang.generator import Instruction
 from jaclang.lexer import Token
 
@@ -23,7 +24,7 @@ class BranchFactory:
         try:
             return self.parseImpl(pos, tokens)
         except TokenExpectedException as exception:
-            raise TokenNeededException(exception)
+            raise TokenNeededException(exception.pos, exception.message)
 
     def parseDontExpect(self, pos: int, tokens: list[Token]) -> (int, Branch):
         try:
@@ -33,10 +34,10 @@ class BranchFactory:
 
 
 # Parser did not recognize branch type (throws if you need to have a branch present somewhere)
-class TokenExpectedException(Exception):
+class TokenExpectedException(JaclangSyntaxError):
     pass
 
 
 # Parser has already recognized branch type and spotted a syntax error
-class TokenNeededException(Exception):
+class TokenNeededException(JaclangSyntaxError):
     pass

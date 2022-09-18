@@ -21,7 +21,7 @@ class ScopeFactory(BranchFactory):
 
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
         if pos >= len(tokens) or tokens[pos] != LEFT_BRACE:
-            raise TokenExpectedException("Expected '{' at beginning of scope")
+            raise TokenExpectedException(0, "Expected '{' at beginning of scope")
         pos += 1
 
         branches = []
@@ -33,9 +33,9 @@ class ScopeFactory(BranchFactory):
                     branches.append(branch)
                     recognized = True
             if pos >= len(tokens):
-                raise TokenNeededException("Expected '}' at the end of scope")
+                raise TokenNeededException(0, "Expected '}' at the end of scope")
             if not recognized:
-                raise TokenNeededException("Did not recognize statement")
+                raise TokenNeededException(0, "Did not recognize statement")
         pos += 1
 
         return pos, ScopeBranch(branches)

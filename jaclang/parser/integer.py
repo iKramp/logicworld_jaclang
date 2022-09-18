@@ -18,7 +18,7 @@ class IntegerBranch(ValueBranch):
 class IntegerFactory(BranchFactory):
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
         if pos >= len(tokens) or type(tokens[pos]) is not ConstantToken:
-            raise TokenExpectedException("Expected integer")
+            raise TokenExpectedException(0, "Expected integer")
         value = tokens[pos].value
         pos += 1
         return pos, IntegerBranch(value)
