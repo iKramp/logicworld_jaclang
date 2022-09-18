@@ -46,6 +46,7 @@ class KeywordToken(Token):
         return self.name
 
 
+UNKNOWN = SymbolToken("UNKNOWN", "")
 LEFT_BRACKET = SymbolToken("LEFT_BRACKET", "(")
 RIGHT_BRACKET = SymbolToken("RIGHT_BRACKET", ")")
 ASSIGNMENT = SymbolToken("ASSIGNMENT", "=")
@@ -84,7 +85,7 @@ def tokenize(code: str, debug_output: bool = False) -> list[Token]:
     while i < len(code):
         curr_symbol = None
         for symbol in SymbolToken.symbols:
-            if code.startswith(symbol.identifier, i):
+            if symbol.identifier != "" and code.startswith(symbol.identifier, i):
                 curr_symbol = symbol
 
         if code[i] == ' ' or curr_symbol is not None:

@@ -1,6 +1,7 @@
 from jaclang.generator import Instruction
 from jaclang.lexer import Token, LEFT_BRACE, RIGHT_BRACE
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
+from jaclang.parser.expression import ExpressionFactory
 
 
 class ScopeBranch(Branch):
@@ -19,7 +20,7 @@ class ScopeBranch(Branch):
 class ScopeFactory(BranchFactory):
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
         factories = [
-
+            ExpressionFactory(),
         ]
 
         if pos >= len(tokens) or tokens[pos] != LEFT_BRACE:
@@ -28,11 +29,16 @@ class ScopeFactory(BranchFactory):
 
         branches = []
         while tokens[pos] != RIGHT_BRACE:
+            recognized = False
             for factory in factories:
                 pos, branch = factory.parseDontExpect(pos, tokens)
-                branches.append(branch)
+                if branch is not None:
+                    branches.append(branch)
+                    recognized = True
             if pos >= len(tokens):
                 raise TokenNeededException("Expected '}' at the end of scope")
+            if not recognized:
+                raise TokenNeededException("Did not recognize statement")
         pos += 1
 
         return pos, ScopeBranch(branches)
