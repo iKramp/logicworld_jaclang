@@ -39,3 +39,6 @@ class ScopeFactory(BranchFactory):
         pos += 1
 
         return pos, ScopeBranch(branches)
+
+
+ScopeFactory.factories.add(ScopeFactory())
