@@ -42,6 +42,9 @@ class IdentifierToken(Token):
     def getInfo(self) -> str:
         return f"ident: {self.identifier}"
 
+    def __hash__(self):
+        return self.identifier.__hash__()
+
     def __eq__(self, other):
         if type(other) is not IdentifierToken:
             return False

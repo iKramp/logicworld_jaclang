@@ -8,5 +8,5 @@ func main() {
         20 + 10
     }
     var a
-    var b = 10
+    var b = 10 + a + f()
 }

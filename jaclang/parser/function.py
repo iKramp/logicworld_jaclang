@@ -2,6 +2,7 @@ from jaclang.generator import Instruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
+from jaclang.parser.expression import ValueFactory, ValueBranch
 from jaclang.parser.scope import ScopeFactory, ScopeBranch
 
 
@@ -44,4 +45,33 @@ class FunctionDeclarationFactory(BranchFactory):
         return pos, FunctionDeclarationBranch(func_name, body)
 
 
+class FunctionCallBranch(ValueBranch):
+    def __init__(self, function_name: str):
+        self.function_name = function_name
+
+    def printInfo(self, nested_level: int):
+        print('    ' * nested_level, f"call: {self.function_name}()")
+
+    def generateInstructions(self) -> list[Instruction]:
+        pass
+
+
+class FunctionCallFactory(BranchFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+        if type(tokens[pos]) is not IdentifierToken:
+            raise TokenExpectedException(tokens[pos].pos, "Expected identifier")
+        function_name = tokens[pos].identifier
+        pos += 1
+        if tokens[pos] != LEFT_BRACKET:
+            raise TokenExpectedException(tokens[pos].pos, "Expected '('")
+
+        pos += 1
+        if tokens[pos] != RIGHT_BRACKET:
+            raise TokenNeededException(tokens[pos].pos, "Expected ')'")
+
+        pos += 1
+        return pos, FunctionCallBranch(function_name)
+
+
+ValueFactory.factories.add(FunctionCallFactory())
 RootFactory.factories.append(FunctionDeclarationFactory())
