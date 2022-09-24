@@ -191,14 +191,39 @@ class PopInstruction(Instruction):
         super().__init__("POP", 0b10100, [reg])
 
 
+class SetSpInstruction(Instruction):
+    def __init__(self, reg: RegisterParameter):
+        super().__init__("SETSP", 0b10101, [reg])
+
+
+class GetSpInstruction(Instruction):
+    def __init__(self, reg: RegisterParameter):
+        super().__init__("GETSP", 0b10110, [EmptyByteParameter(), EmptyByteParameter(), reg])
+
+
+class GetPcInstruction(Instruction):
+    def __init__(self, reg: RegisterParameter):
+        super().__init__("GETPC", 0b10111, [EmptyByteParameter(), EmptyByteParameter(), reg])
+
+
+class PushaInstruction(Instruction):
+    def __init__(self):
+        super().__init__("PUSHA", 0b11000, [EmptyByteParameter()])
+
+
+class PopaInstruction(Instruction):
+    def __init__(self):
+        super().__init__("POPA", 0b11001, [EmptyByteParameter()])
+
+
 class CallInstruction(Instruction):
     def __init__(self, address: int):
-        super().__init__("CALL", 0b10111, [EmptyByteParameter(), Value16Parameter(address)])
+        super().__init__("CALL", 0b11010, [EmptyByteParameter(), Value16Parameter(address)])
 
 
 class RetInstruction(Instruction):
     def __init__(self):
-        super().__init__("RET", 0b11000, [EmptyByteParameter()])
+        super().__init__("RET", 0b11011, [EmptyByteParameter()])
 
 
 def generate(instructions: list[Instruction], debug_output: bool = False) -> list[int]:
