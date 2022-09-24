@@ -1,5 +1,5 @@
 from jaclang.generator import Instruction
-from jaclang.lexer import Token
+from jaclang.lexer import Token, EndToken
 from jaclang.parser.branch import Branch, BranchFactory
 
 
@@ -20,7 +20,7 @@ class RootFactory(BranchFactory):
 
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
         branches = []
-        while pos < len(tokens):
+        while tokens[pos] != EndToken():
             for factory in RootFactory.factories:
                 pos, branch = factory.parseExpect(pos, tokens)
                 branches.append(branch)

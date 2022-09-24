@@ -21,21 +21,21 @@ class FunctionDeclarationBranch(Branch):
 
 class FunctionDeclarationFactory(BranchFactory):
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
-        if pos >= len(tokens) or tokens[pos] != FUNC_KEYWORD:
-            raise TokenExpectedException(0, "Expected func keyword in function declaration")
+        if tokens[pos] != FUNC_KEYWORD:
+            raise TokenExpectedException(tokens[pos].pos, "Expected func keyword in function declaration")
 
         pos += 1
-        if pos >= len(tokens) or type(tokens[pos]) is not IdentifierToken:
-            raise TokenNeededException(0, "Expected identifier after func keyword")
+        if type(tokens[pos]) is not IdentifierToken:
+            raise TokenNeededException(tokens[pos].pos, "Expected identifier after func keyword")
         func_name = tokens[pos].identifier
 
         pos += 1
-        if pos >= len(tokens) or tokens[pos] != LEFT_BRACKET:
-            raise TokenNeededException(0, "Expected '(' after func name")
+        if tokens[pos] != LEFT_BRACKET:
+            raise TokenNeededException(tokens[pos].pos, "Expected '(' after func name")
 
         pos += 1
-        if pos >= len(tokens) or tokens[pos] != RIGHT_BRACKET:
-            raise TokenNeededException(0, "Expected ')' after '('")
+        if tokens[pos] != RIGHT_BRACKET:
+            raise TokenNeededException(tokens[pos].pos, "Expected ')' after '('")
 
         pos += 1
 

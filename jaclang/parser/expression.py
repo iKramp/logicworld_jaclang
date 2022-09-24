@@ -34,7 +34,7 @@ class ValueFactory(BranchFactory):
             if value is not None:
                 return pos, value
 
-        raise TokenExpectedException(0, "Expected value")
+        raise TokenExpectedException(tokens[pos].pos, "Expected value")
 
 
 class ExpressionBranch(Branch):
@@ -58,9 +58,9 @@ class ExpressionFactory(BranchFactory):
         value_factory = ValueFactory()
         pos, value = value_factory.parseDontExpect(pos, tokens)
         if value is None:
-            raise TokenExpectedException(0, "Expected value")
+            raise TokenExpectedException(tokens[pos].pos, "Expected value")
 
-        if pos >= len(tokens) or tokens[pos] not in Operator.operators.keys():
+        if tokens[pos] not in Operator.operators.keys():
             expr_operator = NO_OPERATOR
             next_branch = None
         else:

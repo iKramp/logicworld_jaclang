@@ -5,14 +5,23 @@ class JaclangSyntaxError(Exception):
 
     def printError(self, file_contents: str):
         print(f"SyntaxError: {self.message}")
-        right = self.pos
-        left = self.pos
+        if self.pos == -1:
+            print("Error location not provided")
+        else:
+            right = self.pos
+            left = self.pos
 
-        while right < len(file_contents) and file_contents[right] != '\n':
-            right += 1
+            while right < len(file_contents) and file_contents[right] != '\n':
+                right += 1
 
-        while left >= 0 and file_contents[left - 1] != '\n':
-            left -= 1
+            while left >= 0 and file_contents[left - 1] != '\n':
+                left -= 1
 
-        print(file_contents[left:right].replace("\t", " "))
-        print(" " * (self.pos - left) + "^")
+            line_num = 1
+            for i in range(self.pos):
+                if file_contents[i] == "\n":
+                    line_num += 1
+
+            line_num_prefix = f"line {line_num}: "
+            print(line_num_prefix + file_contents[left:right].replace("\t", " "))
+            print(" " * (self.pos - left + len(line_num_prefix)) + "^")
