@@ -7,4 +7,6 @@ func main() {
     {
         20 + 10
     }
-
+    var a
+    var b = 10
+}

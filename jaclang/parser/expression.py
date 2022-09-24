@@ -43,11 +43,15 @@ class ExpressionBranch(Branch):
         self.expr_operator = expr_operator
         self.next_branch = next_branch
 
-    def printInfo(self, nested_level: int):
+    def printInfoRecursive(self, nested_level: int):
         self.value.printInfo(nested_level)
         if self.expr_operator != NO_OPERATOR:
             print('    ' * nested_level, self.expr_operator.name)
-            self.next_branch.printInfo(nested_level)
+            self.next_branch.printInfoRecursive(nested_level)
+    
+    def printInfo(self, nested_level: int):
+        print('    ' * nested_level, "Expression:")
+        self.printInfoRecursive(nested_level + 1)
 
     def generateInstructions(self) -> list[Instruction]:
         pass
