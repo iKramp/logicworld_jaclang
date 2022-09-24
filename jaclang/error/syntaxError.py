@@ -1,10 +1,15 @@
+RED = '\033[91m'
+BOLD = '\033[1m'
+CLEAR = '\033[0m'
+
+
 class JaclangSyntaxError(Exception):
     def __init__(self, pos: int, message: str):
         self.pos = pos
         self.message = message
 
     def printError(self, file_contents: str):
-        print(f"SyntaxError: {self.message}")
+        print(f"{RED}{BOLD}SyntaxError: {self.message}")
         if self.pos == -1:
             print("Error location not provided")
         else:
@@ -24,4 +29,4 @@ class JaclangSyntaxError(Exception):
 
             line_num_prefix = f"line {line_num}: "
             print(line_num_prefix + file_contents[left:right].replace("\t", " "))
-            print(" " * (self.pos - left + len(line_num_prefix)) + "^")
+            print(" " * (self.pos - left + len(line_num_prefix)) + "^" + CLEAR)
