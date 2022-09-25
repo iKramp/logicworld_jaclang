@@ -75,7 +75,10 @@ class Instruction:
     def printInfo(self):
         info = "    " + self.name + " "
         for param in self.params:
-            info += param.getInfo() + " "
+            param_info = param.getInfo()
+            info += param.getInfo()
+            if param_info:
+                info += " "
         print(info)
 
     def toBytes(self) -> list[int]:
