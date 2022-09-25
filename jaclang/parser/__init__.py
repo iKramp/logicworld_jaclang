@@ -1,5 +1,6 @@
 from jaclang.generator import Instruction
 from jaclang.lexer import Token
+from jaclang.parser.expression import ValueFactory
 from jaclang.parser.root import RootFactory
 
 # modules

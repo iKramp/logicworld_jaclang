@@ -1,4 +1,4 @@
-from jaclang.generator import Instruction
+from jaclang.generator import Instruction, LabelInstruction, RetInstruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
@@ -17,7 +17,14 @@ class FunctionDeclarationBranch(Branch):
         self.body.printInfo(nested_level + 1)
 
     def generateInstructions(self) -> list[Instruction]:
-        pass
+        instructions = [
+            LabelInstruction("f" + self.name)
+        ]
+        instructions += self.body.generateInstructions()
+        instructions += [
+            RetInstruction(),
+        ]
+        return instructions
 
 
 class FunctionDeclarationFactory(BranchFactory):
@@ -53,7 +60,7 @@ class FunctionCallBranch(ValueBranch):
         print('    ' * nested_level, f"call: {self.function_name}()")
 
     def generateInstructions(self) -> list[Instruction]:
-        pass
+        return []
 
 
 class FunctionCallFactory(BranchFactory):
@@ -73,5 +80,5 @@ class FunctionCallFactory(BranchFactory):
         return pos, FunctionCallBranch(function_name)
 
 
-ValueFactory.factories.add(FunctionCallFactory())
+ValueFactory.factories.append(FunctionCallFactory())
 RootFactory.factories.append(FunctionDeclarationFactory())

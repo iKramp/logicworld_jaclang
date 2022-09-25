@@ -18,10 +18,9 @@ def main():
         file_contents = file.read()
 
     try:
-        preprocessed_contents = preprocess(file_contents, True)
-        tokens = tokenize(preprocessed_contents, True)
+        preprocessed_contents = preprocess(file_contents, False)
+        tokens = tokenize(preprocessed_contents, False)
         instructions = parse(tokens, True)
-
         binary_code = generate(instructions, True)
 
         print(f"Binary code size: {len(binary_code)} bytes")

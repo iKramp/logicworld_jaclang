@@ -13,7 +13,7 @@ class VariableDeclarationBranch(Branch):
         self.value = value
 
     def generateInstructions(self) -> list[Instruction]:
-        pass
+        return []
 
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, "VariableDeclaration:")
@@ -50,7 +50,7 @@ class VariableBranch(ValueBranch):
         print('    ' * nested_level, f"var: {self.variable_name}")
 
     def generateInstructions(self) -> list[Instruction]:
-        pass
+        return []
 
 
 class VariableFactory(BranchFactory):
@@ -62,5 +62,5 @@ class VariableFactory(BranchFactory):
         return pos, VariableBranch(variable_name)
 
 
-ValueFactory.factories.add(VariableFactory())
-ScopeFactory.factories.add(VariableDeclarationFactory())
+ValueFactory.factories.append(VariableFactory())
+ScopeFactory.factories.append(VariableDeclarationFactory())

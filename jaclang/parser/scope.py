@@ -13,11 +13,11 @@ class ScopeBranch(Branch):
             branch.printInfo(nested_level + 1)
 
     def generateInstructions(self) -> list[Instruction]:
-        pass
+        return []
 
 
 class ScopeFactory(BranchFactory):
-    factories = set()
+    factories = []
 
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
         if pos >= len(tokens) or tokens[pos] != LEFT_BRACE:
@@ -41,4 +41,4 @@ class ScopeFactory(BranchFactory):
         return pos, ScopeBranch(branches)
 
 
-ScopeFactory.factories.add(ScopeFactory())
+ScopeFactory.factories.append(ScopeFactory())

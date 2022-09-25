@@ -26,7 +26,7 @@ class ValueBranch(Branch, ABC):
 
 
 class ValueFactory(BranchFactory):
-    factories = set()
+    factories = []
 
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
         for factory in ValueFactory.factories:
@@ -54,7 +54,7 @@ class ExpressionBranch(Branch):
         self.printInfoRecursive(nested_level + 1)
 
     def generateInstructions(self) -> list[Instruction]:
-        pass
+        return []
 
 
 class ExpressionFactory(BranchFactory):
@@ -76,4 +76,4 @@ class ExpressionFactory(BranchFactory):
         return pos, ExpressionBranch(value, expr_operator, next_branch)
 
 
-ScopeFactory.factories.add(ExpressionFactory())
+ScopeFactory.factories.append(ExpressionFactory())

@@ -12,7 +12,7 @@ class IntegerBranch(ValueBranch):
         print('    ' * nested_level, self.value)
 
     def generateInstructions(self) -> list[Instruction]:
-        pass
+        return []
 
 
 class IntegerFactory(BranchFactory):
@@ -24,4 +24,4 @@ class IntegerFactory(BranchFactory):
         return pos, IntegerBranch(value)
 
 
-ValueFactory.factories.add(IntegerFactory())
+ValueFactory.factories.append(IntegerFactory())

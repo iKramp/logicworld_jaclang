@@ -1,4 +1,4 @@
-from jaclang.generator import Instruction
+from jaclang.generator import Instruction, NopInstruction
 from jaclang.lexer import Token, EndToken
 from jaclang.parser.branch import Branch, BranchFactory
 
@@ -8,11 +8,15 @@ class RootBranch(Branch):
         self.branches = branches
 
     def printInfo(self, nested_level: int):
-        for branches in self.branches:
-            branches.printInfo(nested_level)
+        for branch in self.branches:
+            branch.printInfo(nested_level)
 
     def generateInstructions(self) -> list[Instruction]:
-        return []
+        instructions = []
+        for branch in self.branches:
+            instructions += branch.generateInstructions()
+        instructions.append(NopInstruction())
+        return instructions
 
 
 class RootFactory(BranchFactory):
