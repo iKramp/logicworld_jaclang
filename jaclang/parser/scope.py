@@ -1,6 +1,9 @@
+from typing import Optional
+
 from jaclang.generator import Instruction
 from jaclang.lexer import Token, LEFT_BRACE, RIGHT_BRACE, EndToken
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
+from jaclang.parser.stack_manager import StackManager
 
 
 class ScopeBranch(Branch):
@@ -12,8 +15,11 @@ class ScopeBranch(Branch):
         for branch in self.branches:
             branch.printInfo(nested_level + 1)
 
-    def generateInstructions(self) -> list[Instruction]:
-        return []
+    def generateInstructions(self, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+        instructions = []
+        for branch in self.branches:
+            instructions += branch.generateInstructions(stack_manager)
+        return instructions
 
 
 class ScopeFactory(BranchFactory):

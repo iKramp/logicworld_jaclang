@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC
+from typing import Optional
 
-from jaclang.generator import Instruction
+from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruction
 from jaclang.lexer import Token, PLUS, MINUS, SymbolToken, UNKNOWN
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException
 from jaclang.parser.scope import ScopeFactory
+from jaclang.parser.stack_manager import StackManager
 
 
 class Operator:
@@ -53,8 +55,15 @@ class ExpressionBranch(Branch):
         print('    ' * nested_level, "Expression:")
         self.printInfoRecursive(nested_level + 1)
 
-    def generateInstructions(self) -> list[Instruction]:
-        return []
+    def generateInstructions(self, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+        instructions = [
+            PushInstruction(EXPR_REG),
+        ]
+
+        instructions += [
+            PopInstruction(EXPR_REG),
+        ]
+        return instructions
 
 
 class ExpressionFactory(BranchFactory):

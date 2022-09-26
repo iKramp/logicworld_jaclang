@@ -1,10 +1,13 @@
+from typing import Optional
+
 from jaclang.generator import Instruction, LabelInstruction, RetInstruction, PushInstruction, SB_REG, PopInstruction, \
-    SetSpInstruction, GetSpInstruction
+    GetSpInstruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
 from jaclang.parser.expression import ValueFactory, ValueBranch
 from jaclang.parser.scope import ScopeFactory, ScopeBranch
+from jaclang.parser.stack_manager import StackManager
 
 
 class FunctionDeclarationBranch(Branch):
@@ -17,8 +20,9 @@ class FunctionDeclarationBranch(Branch):
         print('    ' * nested_level, f"    name: {self.name}")
         self.body.printInfo(nested_level + 1)
 
-    def generateInstructions(self) -> list[Instruction]:
-        body_instructions = self.body.generateInstructions()
+    def generateInstructions(self, _: Optional[StackManager] = None) -> list[Instruction]:
+        stack_manager = StackManager()
+        body_instructions = self.body.generateInstructions(stack_manager)
 
         begin_instructions: list[Instruction] = [
             LabelInstruction("f" + self.name),

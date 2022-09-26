@@ -1,7 +1,10 @@
+from typing import Optional
+
 from jaclang.generator import Instruction
 from jaclang.lexer import Token, ConstantToken
 from jaclang.parser.branch import BranchFactory, Branch, TokenExpectedException
 from jaclang.parser.expression import ValueBranch, ValueFactory
+from jaclang.parser.stack_manager import StackManager
 
 
 class IntegerBranch(ValueBranch):
@@ -11,7 +14,7 @@ class IntegerBranch(ValueBranch):
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, self.value)
 
-    def generateInstructions(self) -> list[Instruction]:
+    def generateInstructions(self, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         return []
 
 
