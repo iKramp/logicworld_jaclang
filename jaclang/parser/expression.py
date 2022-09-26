@@ -40,16 +40,16 @@ class ValueFactory(BranchFactory):
 
 
 class ExpressionBranch(Branch):
-    def __init__(self, value: ValueBranch, expr_operator: Operator, next_branch: ExpressionBranch):
+    def __init__(self, branch: Optional[ExpressionBranch], expr_operator: Operator, value: ValueBranch):
+        self.branch = branch
         self.value = value
         self.expr_operator = expr_operator
-        self.next_branch = next_branch
 
     def printInfoRecursive(self, nested_level: int):
-        self.value.printInfo(nested_level)
         if self.expr_operator != NO_OPERATOR:
+            self.branch.printInfoRecursive(nested_level)
             print('    ' * nested_level, self.expr_operator.name)
-            self.next_branch.printInfoRecursive(nested_level)
+        self.value.printInfo(nested_level)
     
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, "Expression:")
@@ -73,16 +73,19 @@ class ExpressionFactory(BranchFactory):
         if value is None:
             raise TokenExpectedException(tokens[pos].pos, "Expected value")
 
-        if tokens[pos] not in Operator.operators.keys():
-            expr_operator = NO_OPERATOR
-            next_branch = None
-        else:
-            expr_operator = Operator.operators[tokens[pos]]
-            pos += 1
-            branch_factory = ExpressionFactory()
-            pos, next_branch = branch_factory.parseExpect(pos, tokens)
+        return self.parseRecursive(pos, tokens, ExpressionBranch(None, NO_OPERATOR, value))
 
-        return pos, ExpressionBranch(value, expr_operator, next_branch)
+    def parseRecursive(self, pos: int, tokens: list[Token], expr_branch: ExpressionBranch) -> (int, ExpressionBranch):
+        if tokens[pos] not in Operator.operators.keys():
+            return pos, expr_branch
+
+        expr_operator = Operator.operators[tokens[pos]]
+        pos += 1
+        value_factory = ValueFactory()
+        pos, value = value_factory.parseDontExpect(pos, tokens)
+        new_expr_branch = ExpressionBranch(expr_branch, expr_operator, value)
+
+        return self.parseRecursive(pos, tokens, new_expr_branch)
 
 
 ScopeFactory.factories.append(ExpressionFactory())
