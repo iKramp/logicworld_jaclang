@@ -3,7 +3,8 @@ from __future__ import annotations
 from abc import ABC
 from typing import Optional
 
-from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruction
+from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruction, AddInstruction, RET_REG, \
+    SubInstruction, MovInstruction
 from jaclang.lexer import Token, PLUS, MINUS, SymbolToken, UNKNOWN
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException
 from jaclang.parser.scope import ScopeFactory
@@ -60,9 +61,27 @@ class ExpressionBranch(Branch):
             PushInstruction(EXPR_REG),
         ]
 
+        instructions += self.generateInstructionsRecursively(stack_manager)
+
         instructions += [
             PopInstruction(EXPR_REG),
         ]
+        return instructions
+
+    def generateInstructionsRecursively(self, stack_manager: StackManager) -> list[Instruction]:
+        if self.expr_operator == NO_OPERATOR:
+            return self.value.generateInstructions(stack_manager) + [MovInstruction(RET_REG, EXPR_REG)]
+
+        instructions = self.branch.generateInstructionsRecursively(stack_manager)
+        instructions += self.value.generateInstructions(stack_manager)
+        if self.expr_operator == PLUS_OPERATOR:
+            instructions += [
+                AddInstruction(EXPR_REG, RET_REG, EXPR_REG),
+            ]
+        elif self.expr_operator == MINUS_OPERATOR:
+            instructions += [
+                SubInstruction(EXPR_REG, RET_REG, EXPR_REG),
+            ]
         return instructions
 
 
