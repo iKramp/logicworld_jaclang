@@ -5,6 +5,7 @@ from jaclang.lexer import Token, VAR_KEYWORD, IdentifierToken, ASSIGNMENT
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory, ValueFactory, ValueBranch
 from jaclang.parser.scope import ScopeFactory
+from jaclang.parser.stack_manager import StackManager
 
 
 class VariableDeclarationBranch(Branch):
@@ -12,7 +13,7 @@ class VariableDeclarationBranch(Branch):
         self.variable_name = variable_name
         self.value = value
 
-    def generateInstructions(self) -> list[Instruction]:
+    def generateInstructions(self, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         return []
 
     def printInfo(self, nested_level: int):
