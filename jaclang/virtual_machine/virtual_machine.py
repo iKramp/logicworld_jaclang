@@ -8,6 +8,15 @@ class VirtualMachine:
     def getMemorySize(self):
         return len(self.memory)
 
+    def pushToStack(self, value: int):
+        self.memory[self.stack_pointer] = value & 0xFF
+        self.memory[self.stack_pointer + 1] = (value >> 8) & 0xFF
+        self.stack_pointer += 2
+
+    def popFromStack(self) -> int:
+        self.stack_pointer -= 2
+        return self.memory[self.stack_pointer] + (self.memory[self.stack_pointer + 1] << 8)
+
     def run(self, instructions: list[int]):
         for i in range(len(instructions)):
             self.memory[i] = instructions[i]
@@ -73,22 +82,22 @@ class VirtualMachine:
                 reg_save = self.memory[self.program_counter + 3]
                 self.registers[reg_save] = self.registers[reg]
                 self.program_counter += 4
-            # elif curr_opcode == 0b01111:  # jmp
+            # elif curr_opcode == 0b01111:  # cmp
             #     self.program_counter += 2
+            elif curr_opcode == 0b10000:  # jmp
+                reg = self.memory[self.program_counter + 1]
+                self.program_counter = self.registers[reg]
             # elif curr_opcode == 0b10001:  # gpudraw
             #     self.program_counter += 2
             # elif curr_opcode == 0b10010:  # gpudisplay
             #     self.program_counter += 2
             elif curr_opcode == 0b10011:  # push
                 reg = self.memory[self.program_counter + 2]
-                self.memory[self.stack_pointer] = self.registers[reg] & 0xFF
-                self.memory[self.stack_pointer + 1] = (self.registers[reg] >> 8) & 0xFF
-                self.stack_pointer += 2
+                self.pushToStack(self.registers[reg])
                 self.program_counter += 4
             elif curr_opcode == 0b10100:  # pop
                 reg = self.memory[self.program_counter + 3]
-                self.stack_pointer -= 2
-                self.registers[reg] = self.memory[self.stack_pointer] + (self.memory[self.stack_pointer + 1] << 8)
+                self.registers[reg] = self.popFromStack()
                 self.program_counter += 4
             # elif curr_opcode == 0b10101:  # setsp
             #     self.program_counter += 2
@@ -98,15 +107,6 @@ class VirtualMachine:
                 self.program_counter += 4
             # elif curr_opcode == 0b10111:  # getpc
             #     self.program_counter += 2
-            # elif curr_opcode == 0b11000:  # pusha
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b11001:  # popa
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b11010:  # call
-            #     self.program_counter += 2
-            elif curr_opcode == 0b11011:  # ret
-                # todo: implement
-                self.program_counter += 2
             else:
                 print(f"Unknown opcode: {curr_opcode} {curr_opcode:b}")
                 return
@@ -117,6 +117,4 @@ class VirtualMachine:
         for i in range(8):
             print(f"REG{i}: {self.registers[i]}")
 
-        print(f"Cycles used: {cycle_count}")
-
-
+        print(f"Cycles made: {cycle_count}")

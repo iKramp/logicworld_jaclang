@@ -1,7 +1,7 @@
 from typing import Optional
 
-from jaclang.generator import Instruction, LabelInstruction, RetInstruction, PushInstruction, SB_REG, PopInstruction, \
-    GetSpInstruction
+from jaclang.generator import Instruction, LabelInstruction, PushInstruction, SB_REG, PopInstruction, \
+    GetSpInstruction, JMP_REG, JmpInstruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
@@ -33,7 +33,8 @@ class FunctionDeclarationBranch(Branch):
 
         end_instructions: list[Instruction] = [
             PopInstruction(SB_REG),
-            RetInstruction(),
+            PopInstruction(JMP_REG),
+            JmpInstruction(JMP_REG),
         ]
 
         return begin_instructions + body_instructions + end_instructions

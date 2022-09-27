@@ -1,3 +1,4 @@
+from jaclang.error.syntaxError import JaclangSyntaxError
 from jaclang.generator import Instruction, EmptyByteParameter, RegisterParameter, Value16Parameter, Value8Parameter
 
 
@@ -147,6 +148,36 @@ class ImmediateInstruction(Instruction):
         print(f"    {self.reg_save.getInfo()} = {self.value}")
 
 
+class ImmediatePcInstruction(Instruction):
+    def __init__(self, reg_save: RegisterParameter, offset: int):
+        super().__init__("IMM", 0b01101, [], 4)
+        self.reg_save = reg_save
+        self.offset = offset
+
+    def printInfo(self):
+        print(f"    {self.reg_save.getInfo()} = PC + {self.offset}")
+
+    def toBytes(self, curr_addr: int, labels: dict[str, int]) -> list[int]:
+        value = curr_addr + self.offset
+        return [self.opcode] + self.reg_save.toBytes() + Value16Parameter(value).toBytes()
+
+
+class ImmediateLabelInstruction(Instruction):
+    def __init__(self, reg_save: RegisterParameter, label_name: str):
+        super().__init__("IMM", 0b01101, [], 4)
+        self.reg_save = reg_save
+        self.label_name = label_name
+
+    def printInfo(self):
+        print(f"    {self.reg_save.getInfo()} = label {self.label_name}")
+
+    def toBytes(self, curr_addr: int, labels: dict[str, int]) -> list[int]:
+        if self.label_name not in labels.keys():
+            raise JaclangSyntaxError(-1, f"Undefined symbol '{self.label_name}'")
+        value = labels[self.label_name]
+        return [self.opcode] + self.reg_save.toBytes() + Value16Parameter(value).toBytes()
+
+
 class MovInstruction(Instruction):
     def __init__(self, reg_a: RegisterParameter, reg_save: RegisterParameter):
         super().__init__("MOV", 0b01110, [reg_a, EmptyByteParameter(), reg_save], 4)
@@ -163,8 +194,8 @@ class CmpInstruction(Instruction):
 
 
 class JmpInstruction(Instruction):
-    def __init__(self, address: int):
-        super().__init__("JMP", 0b10000, [EmptyByteParameter(), Value16Parameter(address)], 4)
+    def __init__(self, reg: RegisterParameter):
+        super().__init__("JMP", 0b10000, [reg, EmptyByteParameter(), EmptyByteParameter()], 4)
 
 
 class GpuDrawInstruction(Instruction):
@@ -214,26 +245,6 @@ class GetPcInstruction(Instruction):
         print(f"    {self.reg.getInfo()} = PC")
 
 
-class PushaInstruction(Instruction):
-    def __init__(self):
-        super().__init__("PUSHA", 0b11000, [EmptyByteParameter()], 2)
-
-
-class PopaInstruction(Instruction):
-    def __init__(self):
-        super().__init__("POPA", 0b11001, [EmptyByteParameter()], 2)
-
-
-class CallInstruction(Instruction):
-    def __init__(self, address: int):
-        super().__init__("CALL", 0b11010, [EmptyByteParameter(), Value16Parameter(address)], 4)
-
-
-class RetInstruction(Instruction):
-    def __init__(self):
-        super().__init__("RET", 0b11011, [EmptyByteParameter()], 2)
-
-
 class LabelInstruction(Instruction):
     def __init__(self, label_name: str):
         super().__init__("", 0b00000, [], 0)
@@ -241,3 +252,6 @@ class LabelInstruction(Instruction):
 
     def printInfo(self):
         print(f"{self.label_name}:")
+
+    def preCompile(self, curr_addr: int, labels: dict[str, int]):
+        labels[self.label_name] = curr_addr

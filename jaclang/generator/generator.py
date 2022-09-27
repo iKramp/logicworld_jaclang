@@ -26,15 +26,15 @@ class RegisterParameter(Parameter):
 REG0 = RegisterParameter(0, "R0")
 REG1 = RegisterParameter(1, "R1")
 REG2 = RegisterParameter(2, "R2")
-REG3 = RegisterParameter(3, "R3")
-REG4 = RegisterParameter(4, "R4")
+JMP_REG = RegisterParameter(3, "RJMP")
+GLOBAL_REG = RegisterParameter(4, "RGLOB")
 EXPR_REG = RegisterParameter(5, "REXPR")
 RET_REG = RegisterParameter(6, "RRET")
 SB_REG = RegisterParameter(7, "RSB")
 
 
 class Value16Parameter(Parameter):
-    def __init__(self, value):
+    def __init__(self, value: int):
         self.value = value
 
     def toBytes(self) -> list[int]:
@@ -45,7 +45,7 @@ class Value16Parameter(Parameter):
 
 
 class Value8Parameter(Parameter):
-    def __init__(self, value):
+    def __init__(self, value: int):
         self.value = value
 
     def toBytes(self) -> list[int]:
@@ -81,7 +81,7 @@ class Instruction:
                 info += " "
         print(info)
 
-    def toBytes(self) -> list[int]:
+    def toBytes(self, curr_addr: int, labels: dict[str, int]) -> list[int]:
         if self.length == 0:
             return []
 
@@ -94,6 +94,9 @@ class Instruction:
 
         return byte_arr
 
+    def preCompile(self, curr_addr: int, labels: dict[str, int]):
+        pass
+
 
 def generate(instructions: list[Instruction], debug_output: bool = False) -> list[int]:
     if debug_output:
@@ -103,6 +106,15 @@ def generate(instructions: list[Instruction], debug_output: bool = False) -> lis
             instruction.printInfo()
         print("---------------------------------")
     binary_code = []
+    curr_addr = 0
+    labels = {}
+
     for instruction in instructions:
-        binary_code += instruction.toBytes()
+        instruction.preCompile(curr_addr, labels)
+        curr_addr += instruction.length
+
+    curr_addr = 0
+    for instruction in instructions:
+        binary_code += instruction.toBytes(curr_addr, labels)
+        curr_addr += instruction.length
     return binary_code

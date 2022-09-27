@@ -1,6 +1,6 @@
 from typing import Optional
 
-from jaclang.generator import Instruction, RetInstruction, MovInstruction, EXPR_REG, RET_REG
+from jaclang.generator import Instruction, PopInstruction, JmpInstruction, JMP_REG, SB_REG
 from jaclang.lexer import Token, RETURN_KEYWORD
 from jaclang.parser.branch import Branch, BranchFactory, SymbolData, TokenExpectedException
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory
@@ -17,7 +17,9 @@ class ReturnStatementBranch(Branch):
         if self.value is not None:
             instructions += self.value.generateInstructions(symbols, stack_manager)
         instructions += [
-            RetInstruction(),
+            PopInstruction(SB_REG),
+            PopInstruction(JMP_REG),
+            JmpInstruction(JMP_REG),
         ]
         return instructions
 
