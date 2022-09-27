@@ -22,7 +22,8 @@ class FunctionDeclarationBranch(Branch):
 
     def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
         stack_manager = StackManager()
-        body_instructions = self.body.generateInstructions(stack_manager)
+        func_symbols = symbols
+        body_instructions = self.body.generateInstructions(func_symbols, stack_manager)
 
         begin_instructions: list[Instruction] = [
             LabelInstruction("f" + self.name),
