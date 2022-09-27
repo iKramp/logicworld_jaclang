@@ -34,7 +34,7 @@ Options:
 
         print(f"Binary code size: {len(binary_code)} bytes")
 
-        virtual_machine = VirtualMachine(256)
+        virtual_machine = VirtualMachine(256 * 4)
         virtual_machine.run(binary_code)
     except JaclangSyntaxError as error:
         error.printError(file_contents)

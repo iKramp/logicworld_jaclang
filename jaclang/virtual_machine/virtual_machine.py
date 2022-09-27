@@ -51,11 +51,18 @@ class VirtualMachine:
                 reg_value = self.memory[self.program_counter + 2]
                 offset = self.memory[self.program_counter + 3]
                 address = self.registers[reg_addr] + offset
-                value = self.memory[address * 2] + (self.memory[address * 2 + 1] << 8)
-                self.registers[reg_value] = value
+                value = self.registers[reg_value]
+                self.memory[address * 2] = value & 0xFF
+                self.memory[address * 2 + 1] = (value >> 8) & 0xFF
                 self.program_counter += 4
-            # elif curr_opcode == 0b01100:  # memr
-            #     self.program_counter += 2
+            elif curr_opcode == 0b01100:  # memr
+                reg_addr = self.memory[self.program_counter + 1]
+                offset = self.memory[self.program_counter + 2]
+                reg_save = self.memory[self.program_counter + 3]
+                address = self.registers[reg_addr] + offset
+                value = self.memory[address * 2] + (self.memory[address * 2 + 1] << 8)
+                self.registers[reg_save] = value
+                self.program_counter += 4
             elif curr_opcode == 0b01101:  # imm
                 reg = self.memory[self.program_counter + 1]
                 value = self.memory[self.program_counter + 2] + (self.memory[self.program_counter + 3] << 8)

@@ -80,6 +80,9 @@ class KeywordToken(Token):
     def getInfo(self) -> str:
         return self.name
 
+    def __hash__(self):
+        return self.identifier.__hash__()
+
     def __eq__(self, other):
         if type(other) is not KeywordToken:
             return False
@@ -92,6 +95,9 @@ class EndToken(Token):
 
     def getInfo(self) -> str:
         return "END"
+
+    def __hash__(self):
+        return "EndToken".__hash__()
 
     def __eq__(self, other):
         return type(other) is EndToken
