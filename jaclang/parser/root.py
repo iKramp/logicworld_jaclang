@@ -2,7 +2,7 @@ from typing import Optional
 
 from jaclang.generator import Instruction, NopInstruction
 from jaclang.lexer import Token, EndToken
-from jaclang.parser.branch import Branch, BranchFactory
+from jaclang.parser.branch import Branch, BranchFactory, SymbolData
 from jaclang.parser.stack_manager import StackManager
 
 
@@ -14,10 +14,10 @@ class RootBranch(Branch):
         for branch in self.branches:
             branch.printInfo(nested_level)
 
-    def generateInstructions(self, _: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
         instructions = []
         for branch in self.branches:
-            instructions += branch.generateInstructions()
+            instructions += branch.generateInstructions(symbols)
         instructions.append(NopInstruction())
         return instructions
 

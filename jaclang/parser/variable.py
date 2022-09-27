@@ -2,7 +2,7 @@ from typing import Optional
 
 from jaclang.generator.generator import Instruction
 from jaclang.lexer import Token, VAR_KEYWORD, IdentifierToken, ASSIGNMENT
-from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
+from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory, ValueFactory, ValueBranch
 from jaclang.parser.scope import ScopeFactory
 from jaclang.parser.stack_manager import StackManager
@@ -13,7 +13,7 @@ class VariableDeclarationBranch(Branch):
         self.variable_name = variable_name
         self.value = value
 
-    def generateInstructions(self, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         return []
 
     def printInfo(self, nested_level: int):
@@ -50,7 +50,7 @@ class VariableBranch(ValueBranch):
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, f"var: {self.variable_name}")
 
-    def generateInstructions(self) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         return []
 
 

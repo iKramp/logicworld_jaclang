@@ -6,7 +6,7 @@ from typing import Optional
 from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruction, AddInstruction, RET_REG, \
     SubInstruction, MovInstruction
 from jaclang.lexer import Token, PLUS, MINUS, SymbolToken, UNKNOWN
-from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException
+from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, SymbolData
 from jaclang.parser.scope import ScopeFactory
 from jaclang.parser.stack_manager import StackManager
 
@@ -56,24 +56,24 @@ class ExpressionBranch(Branch):
         print('    ' * nested_level, "Expression:")
         self.printInfoRecursive(nested_level + 1)
 
-    def generateInstructions(self, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         instructions = [
             PushInstruction(EXPR_REG),
         ]
 
-        instructions += self.generateInstructionsRecursively(stack_manager)
+        instructions += self.generateInstructionsRecursively(symbols, stack_manager)
 
         instructions += [
             PopInstruction(EXPR_REG),
         ]
         return instructions
 
-    def generateInstructionsRecursively(self, stack_manager: StackManager) -> list[Instruction]:
+    def generateInstructionsRecursively(self, symbols: dict[str, SymbolData], stack_manager: StackManager) -> list[Instruction]:
         if self.expr_operator == NO_OPERATOR:
-            return self.value.generateInstructions(stack_manager) + [MovInstruction(RET_REG, EXPR_REG)]
+            return self.value.generateInstructions(symbols, stack_manager) + [MovInstruction(RET_REG, EXPR_REG)]
 
-        instructions = self.branch.generateInstructionsRecursively(stack_manager)
-        instructions += self.value.generateInstructions(stack_manager)
+        instructions = self.branch.generateInstructionsRecursively(symbols, stack_manager)
+        instructions += self.value.generateInstructions(symbols, stack_manager)
         if self.expr_operator == PLUS_OPERATOR:
             instructions += [
                 AddInstruction(EXPR_REG, RET_REG, EXPR_REG),

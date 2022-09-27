@@ -4,7 +4,7 @@ from jaclang.generator import Instruction, LabelInstruction, RetInstruction, Pus
     GetSpInstruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
 from jaclang.parser import RootFactory
-from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException
+from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ValueFactory, ValueBranch
 from jaclang.parser.scope import ScopeFactory, ScopeBranch
 from jaclang.parser.stack_manager import StackManager
@@ -20,7 +20,7 @@ class FunctionDeclarationBranch(Branch):
         print('    ' * nested_level, f"    name: {self.name}")
         self.body.printInfo(nested_level + 1)
 
-    def generateInstructions(self, _: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
         stack_manager = StackManager()
         body_instructions = self.body.generateInstructions(stack_manager)
 
@@ -70,7 +70,7 @@ class FunctionCallBranch(ValueBranch):
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, f"call: {self.function_name}()")
 
-    def generateInstructions(self) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
         return []
 
 

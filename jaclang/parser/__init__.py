@@ -22,4 +22,5 @@ def parse(tokens: list[Token], debug_output: bool = False) -> list[Instruction]:
         root_branch.printInfo(0)
         print("---------------------------------")
 
-    return root_branch.generateInstructions()
+    symbols = {}
+    return root_branch.generateInstructions(symbols)

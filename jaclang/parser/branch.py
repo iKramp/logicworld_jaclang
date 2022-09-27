@@ -7,9 +7,13 @@ from jaclang.lexer import Token
 from jaclang.parser.stack_manager import StackManager
 
 
+class SymbolData:
+    pass
+
+
 class Branch:
     @abstractmethod
-    def generateInstructions(self, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         pass
 
     @abstractmethod

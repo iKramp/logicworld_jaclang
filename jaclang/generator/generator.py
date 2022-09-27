@@ -23,14 +23,14 @@ class RegisterParameter(Parameter):
         return self.name
 
 
-REG0 = RegisterParameter(0, "REG0")
-REG1 = RegisterParameter(1, "REG1")
-REG2 = RegisterParameter(2, "REG2")
-REG3 = RegisterParameter(3, "REG3")
-REG4 = RegisterParameter(4, "REG4")
-EXPR_REG = RegisterParameter(5, "EXPR_REG")
-RET_REG = RegisterParameter(6, "RET_REG")
-SB_REG = RegisterParameter(7, "SB_REG")
+REG0 = RegisterParameter(0, "R0")
+REG1 = RegisterParameter(1, "R1")
+REG2 = RegisterParameter(2, "R2")
+REG3 = RegisterParameter(3, "R3")
+REG4 = RegisterParameter(4, "R4")
+EXPR_REG = RegisterParameter(5, "REXPR")
+RET_REG = RegisterParameter(6, "RRET")
+SB_REG = RegisterParameter(7, "RSB")
 
 
 class Value16Parameter(Parameter):
@@ -103,6 +103,12 @@ class NopInstruction(Instruction):
 class AddInstruction(Instruction):
     def __init__(self, reg_a: RegisterParameter, reg_b: RegisterParameter, reg_save: RegisterParameter):
         super().__init__("ADD", 0b00001, [reg_a, reg_b, reg_save], 4)
+        self.reg_a = reg_a
+        self.reg_b = reg_b
+        self.reg_save = reg_save
+
+    def printInfo(self):
+        print(f"    {self.reg_save.getInfo()} = {self.reg_a.getInfo()} + {self.reg_b.getInfo()}")
 
 
 class SubInstruction(Instruction):
