@@ -13,6 +13,7 @@ class VirtualMachine:
             self.memory[i] = instructions[i]
         self.stack_pointer = len(instructions)
 
+        cycle_count = 0
         while True:
             curr_opcode = self.memory[self.program_counter]
             if curr_opcode == 0b00000:  # nop
@@ -103,8 +104,12 @@ class VirtualMachine:
                 print(f"Unknown opcode: {curr_opcode} {curr_opcode:b}")
                 return
 
+            cycle_count += 1
+
         print("Registers:")
         for i in range(8):
             print(f"REG{i}: {self.registers[i]}")
 
-        
+        print(f"Cycles used: {cycle_count}")
+
+

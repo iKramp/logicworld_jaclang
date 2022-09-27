@@ -38,7 +38,7 @@ class Value16Parameter(Parameter):
         self.value = value
 
     def toBytes(self) -> list[int]:
-        return [self.value & 0xFF, (self.value << 8) & 0xFF]
+        return [self.value & 0xFF, (self.value >> 8) & 0xFF]
 
     def getInfo(self) -> str:
         return str(self.value)
