@@ -59,6 +59,9 @@ class ConstantToken(Token):
     def getInfo(self) -> str:
         return f"value: {self.value}"
 
+    def __hash__(self):
+        return self.value.__hash__()
+
     def __eq__(self, other):
         if type(other) is not ConstantToken:
             return False
@@ -123,6 +126,7 @@ FUNC_KEYWORD = KeywordToken("FUNC", "func")
 IF_KEYWORD = KeywordToken("IF", "if")
 WHILE_KEYWORD = KeywordToken("WHILE", "while")
 VAR_KEYWORD = KeywordToken("VAR", "var")
+RETURN_KEYWORD = KeywordToken("RETURN", "return")
 
 
 def tokenize(code: str, debug_output: bool = False) -> list[Token]:

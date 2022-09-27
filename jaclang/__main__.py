@@ -5,6 +5,7 @@ from jaclang.generator import generate
 from jaclang.lexer import tokenize
 from jaclang.parser import parse
 from jaclang.preprocessor import preprocess
+from jaclang.virtual_machine import VirtualMachine
 
 
 def main():
@@ -32,6 +33,9 @@ Options:
         binary_code = generate(instructions, "debug_assembly" in options)
 
         print(f"Binary code size: {len(binary_code)} bytes")
+
+        virtual_machine = VirtualMachine(256)
+        virtual_machine.run(binary_code)
     except JaclangSyntaxError as error:
         error.printError(file_contents)
         exit(1)

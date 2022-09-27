@@ -1,4 +1,4 @@
-func test() {
+/*func test() {
     1 + 1 - 10 + 100 + 256182
 }
 
@@ -9,4 +9,9 @@ func main() {
     }
     var a
     var b = 10 + a + f()
+    100 + 100 + 100
+}*/
+
+func main() {
+    return 100 + 100 + 100 + 322
 }

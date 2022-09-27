@@ -1,7 +1,7 @@
 from typing import Optional
 
 from jaclang.error.syntaxError import JaclangSyntaxError
-from jaclang.generator.generator import Instruction, MemwInstruction, RET_REG, SB_REG, MemrInstruction
+from jaclang.generator import Instruction, MemwInstruction, RET_REG, SB_REG, MemrInstruction
 from jaclang.lexer import Token, VAR_KEYWORD, IdentifierToken, ASSIGNMENT
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory, ValueFactory, ValueBranch

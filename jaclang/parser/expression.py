@@ -64,6 +64,7 @@ class ExpressionBranch(Branch):
         instructions += self.generateInstructionsRecursively(symbols, stack_manager)
 
         instructions += [
+            MovInstruction(EXPR_REG, RET_REG),
             PopInstruction(EXPR_REG),
         ]
         return instructions
