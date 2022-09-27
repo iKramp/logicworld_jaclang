@@ -18,7 +18,6 @@ class RootBranch(Branch):
         instructions = []
         for branch in self.branches:
             instructions += branch.generateInstructions(symbols)
-        instructions.append(NopInstruction())
         return instructions
 
 

@@ -1,11 +1,17 @@
 from typing import Optional
 
-from jaclang.generator.generator import Instruction
+from jaclang.error.syntaxError import JaclangSyntaxError
+from jaclang.generator.generator import Instruction, MemwInstruction, RET_REG, SB_REG, MemrInstruction
 from jaclang.lexer import Token, VAR_KEYWORD, IdentifierToken, ASSIGNMENT
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory, ValueFactory, ValueBranch
 from jaclang.parser.scope import ScopeFactory
 from jaclang.parser.stack_manager import StackManager
+
+
+class VariableData(SymbolData):
+    def __init__(self, pos_on_stack: int):
+        self.pos_on_stack = pos_on_stack
 
 
 class VariableDeclarationBranch(Branch):
@@ -14,7 +20,15 @@ class VariableDeclarationBranch(Branch):
         self.value = value
 
     def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
-        return []
+        pos_on_stack = stack_manager.allocate()
+        instructions = []
+        if self.value is not None:
+            instructions += self.value.generateInstructions(symbols, stack_manager)
+            instructions += [
+                MemwInstruction(SB_REG, pos_on_stack, RET_REG),
+            ]
+        symbols[self.variable_name] = VariableData(pos_on_stack)
+        return instructions
 
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, "VariableDeclaration:")
@@ -51,7 +65,15 @@ class VariableBranch(ValueBranch):
         print('    ' * nested_level, f"var: {self.variable_name}")
 
     def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
-        return []
+        if self.variable_name not in symbols.keys():
+            raise JaclangSyntaxError(-1, f"Variable '{self.variable_name}' not found")
+        variable_obj = symbols[self.variable_name]
+        if type(variable_obj) is not VariableData:
+            raise JaclangSyntaxError(-1, f"Label '{self.variable_name}' is not a variable")
+
+        return [
+            MemrInstruction(SB_REG, variable_obj.pos_on_stack, RET_REG),
+        ]
 
 
 class VariableFactory(BranchFactory):
