@@ -1,4 +1,4 @@
-from jaclang.error.syntaxError import JaclangSyntaxError
+from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, EmptyByteParameter, RegisterParameter, Value16Parameter, Value8Parameter
 
 
@@ -234,15 +234,6 @@ class GetSpInstruction(Instruction):
 
     def printInfo(self):
         print(f"    {self.reg.getInfo()} = SP")
-
-
-class GetPcInstruction(Instruction):
-    def __init__(self, reg: RegisterParameter):
-        super().__init__("GETPC", 0b10111, [EmptyByteParameter(), EmptyByteParameter(), reg], 4)
-        self.reg = reg
-
-    def printInfo(self):
-        print(f"    {self.reg.getInfo()} = PC")
 
 
 class LabelInstruction(Instruction):

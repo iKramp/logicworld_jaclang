@@ -1,4 +1,4 @@
-from jaclang.error.syntaxError import JaclangSyntaxError
+from jaclang.error.syntax_error import JaclangSyntaxError
 
 
 def removeSingleLineComments(code: str) -> str:

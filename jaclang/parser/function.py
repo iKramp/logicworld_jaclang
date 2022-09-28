@@ -1,7 +1,7 @@
 from typing import Optional
 
 from jaclang.generator import Instruction, LabelInstruction, PushInstruction, SB_REG, PopInstruction, \
-    GetSpInstruction, JMP_REG, JmpInstruction
+    GetSpInstruction, JMP_REG, JmpInstruction, ImmediateLabelInstruction, ImmediatePcInstruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
@@ -73,7 +73,20 @@ class FunctionCallBranch(ValueBranch):
         print('    ' * nested_level, f"call: {self.function_name}()")
 
     def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
-        return []
+        jump_instructions: list[Instruction] = [
+            PushInstruction(JMP_REG),
+            ImmediateLabelInstruction(JMP_REG, "f" + self.function_name),
+            JmpInstruction(JMP_REG),
+        ]
+
+        jump_size = 0
+        for instruction in jump_instructions:
+            jump_size += instruction.length
+
+        start_instructions: list[Instruction] = [
+            ImmediatePcInstruction(JMP_REG, jump_size + 4),
+        ]
+        return start_instructions + jump_instructions
 
 
 class FunctionCallFactory(BranchFactory):

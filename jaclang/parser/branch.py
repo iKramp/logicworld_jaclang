@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Optional
 
-from jaclang.error.syntaxError import JaclangSyntaxError
+from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction
 from jaclang.lexer import Token
 from jaclang.parser.stack_manager import StackManager
