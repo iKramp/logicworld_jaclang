@@ -6,5 +6,5 @@ func function() {
 func main() {
     var a = 100
     var b = 200 + a + function()
-    return b + a + b + 100
+    return b + a + b + 100 - (100 + 100)
 }

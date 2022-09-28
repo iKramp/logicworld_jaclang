@@ -1,5 +1,7 @@
+from copy import copy
 from typing import Optional
 
+from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, LabelInstruction, PushInstruction, SB_REG, PopInstruction, \
     GetSpInstruction, JMP_REG, JmpInstruction, ImmediateLabelInstruction, ImmediatePcInstruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
@@ -8,6 +10,10 @@ from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException,
 from jaclang.parser.expression import ValueFactory, ValueBranch
 from jaclang.parser.scope import ScopeFactory, ScopeBranch
 from jaclang.parser.stack_manager import StackManager
+
+
+class FunctionData(SymbolData):
+    pass
 
 
 class FunctionDeclarationBranch(Branch):
@@ -21,8 +27,10 @@ class FunctionDeclarationBranch(Branch):
         self.body.printInfo(nested_level + 1)
 
     def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
+        symbols[self.name] = FunctionData()
+
         stack_manager = StackManager()
-        func_symbols = symbols
+        func_symbols = copy(symbols)
         body_instructions = self.body.generateInstructions(func_symbols, stack_manager)
 
         begin_instructions: list[Instruction] = [
@@ -73,6 +81,12 @@ class FunctionCallBranch(ValueBranch):
         print('    ' * nested_level, f"call: {self.function_name}()")
 
     def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
+        if self.function_name not in symbols.keys():
+            raise JaclangSyntaxError(-1, f"Symbol '{self.function_name}' undefined")
+
+        if type(symbols[self.function_name]) is not FunctionData:
+            raise JaclangSyntaxError(-1, f"Symbol '{self.function_name}' is not a function")
+
         jump_instructions: list[Instruction] = [
             PushInstruction(JMP_REG),
             ImmediateLabelInstruction(JMP_REG, "f" + self.function_name),
