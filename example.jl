@@ -1,10 +1,14 @@
+func function2() {
+    var b = 20
+    var a = b + 20 // 40
+    return a + b // 60
+}
+
 func function() {
-    var a = 10 + 20
-    return 69 + a
+    var a = 30
+    return 10 + a + function2() // 100
 }
 
 func main() {
-    var a = 100
-    var b = 200 + a + function()
-    return b + a + b + 100 - (100 + 100 - (20 + 20))
+    return function() + function() // 200
 }

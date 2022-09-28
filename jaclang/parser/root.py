@@ -1,7 +1,7 @@
 from typing import Optional
 
 from jaclang.generator import Instruction, NopInstruction, ImmediatePcInstruction, JmpInstruction, PushInstruction, \
-    ImmediateLabelInstruction, JMP_REG
+    ImmediateLabelInstruction, ADDR_REG, GetSpInstruction, SB_REG
 from jaclang.lexer import Token, EndToken
 from jaclang.parser.branch import Branch, BranchFactory, SymbolData
 from jaclang.parser.stack_manager import StackManager
@@ -21,9 +21,9 @@ class RootBranch(Branch):
             instructions += branch.generateInstructions(symbols)
 
         jump_instructions: list[Instruction] = [
-            PushInstruction(JMP_REG),
-            ImmediateLabelInstruction(JMP_REG, "fmain"),
-            JmpInstruction(JMP_REG),
+            PushInstruction(ADDR_REG),
+            ImmediateLabelInstruction(ADDR_REG, "fmain"),
+            JmpInstruction(ADDR_REG),
         ]
 
         jump_size = 0
@@ -31,8 +31,9 @@ class RootBranch(Branch):
             jump_size += instruction.length
 
         start_instructions: list[Instruction] = [
-            ImmediatePcInstruction(JMP_REG, jump_size + 4),
-    ]
+            GetSpInstruction(SB_REG),
+            ImmediatePcInstruction(ADDR_REG, jump_size + 4),
+        ]
 
         start_instructions += jump_instructions + [
             NopInstruction(),

@@ -3,7 +3,8 @@ from typing import Optional
 
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, LabelInstruction, PushInstruction, SB_REG, PopInstruction, \
-    GetSpInstruction, JMP_REG, JmpInstruction, ImmediateLabelInstruction, ImmediatePcInstruction
+    GetSpInstruction, ADDR_REG, JmpInstruction, ImmediateLabelInstruction, ImmediatePcInstruction, MovInstruction, \
+    ImmediateInstruction, RET_REG, AddInstruction, SetSpInstruction
 from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
@@ -35,14 +36,20 @@ class FunctionDeclarationBranch(Branch):
 
         begin_instructions: list[Instruction] = [
             LabelInstruction("f" + self.name),
-            PushInstruction(SB_REG),
+            MovInstruction(SB_REG, ADDR_REG),
             GetSpInstruction(SB_REG),
+            ImmediateInstruction(RET_REG, stack_manager.getSize()),
+            AddInstruction(SB_REG, RET_REG, RET_REG),
+            SetSpInstruction(RET_REG),
+            PushInstruction(ADDR_REG),
         ]
 
         end_instructions: list[Instruction] = [
-            PopInstruction(SB_REG),
-            PopInstruction(JMP_REG),
-            JmpInstruction(JMP_REG),
+            PopInstruction(ADDR_REG),
+            SetSpInstruction(SB_REG),
+            MovInstruction(ADDR_REG, SB_REG),
+            PopInstruction(ADDR_REG),
+            JmpInstruction(ADDR_REG),
         ]
 
         return begin_instructions + body_instructions + end_instructions
@@ -88,9 +95,9 @@ class FunctionCallBranch(ValueBranch):
             raise JaclangSyntaxError(-1, f"Symbol '{self.function_name}' is not a function")
 
         jump_instructions: list[Instruction] = [
-            PushInstruction(JMP_REG),
-            ImmediateLabelInstruction(JMP_REG, "f" + self.function_name),
-            JmpInstruction(JMP_REG),
+            PushInstruction(ADDR_REG),
+            ImmediateLabelInstruction(ADDR_REG, "f" + self.function_name),
+            JmpInstruction(ADDR_REG),
         ]
 
         jump_size = 0
@@ -98,7 +105,7 @@ class FunctionCallBranch(ValueBranch):
             jump_size += instruction.length
 
         start_instructions: list[Instruction] = [
-            ImmediatePcInstruction(JMP_REG, jump_size + 4),
+            ImmediatePcInstruction(ADDR_REG, jump_size + 4),
         ]
         return start_instructions + jump_instructions
 

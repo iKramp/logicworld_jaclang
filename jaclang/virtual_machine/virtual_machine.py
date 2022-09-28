@@ -99,22 +99,19 @@ class VirtualMachine:
                 reg = self.memory[self.program_counter + 3]
                 self.registers[reg] = self.popFromStack()
                 self.program_counter += 4
-            # elif curr_opcode == 0b10101:  # setsp
-            #     self.program_counter += 2
+            elif curr_opcode == 0b10101:  # setsp
+                reg = self.memory[self.program_counter + 1]
+                self.stack_pointer = self.registers[reg]
+                self.program_counter += 2
             elif curr_opcode == 0b10110:  # getsp
                 reg = self.memory[self.program_counter + 3]
                 self.registers[reg] = self.stack_pointer
                 self.program_counter += 4
-            # elif curr_opcode == 0b10111:  # getpc
-            #     self.program_counter += 2
             else:
                 print(f"Unknown opcode: {curr_opcode} {curr_opcode:b}")
                 return
 
             cycle_count += 1
 
-        print("Registers:")
-        for i in range(8):
-            print(f"REG{i}: {self.registers[i]}")
-
+        print(f"Program returned {self.registers[6]}")
         print(f"Cycles made: {cycle_count}")
