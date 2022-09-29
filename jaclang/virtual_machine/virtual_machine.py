@@ -46,22 +46,53 @@ class VirtualMachine:
                 reg_save = self.memory[self.program_counter + 3]
                 self.registers[reg_save] = self.registers[reg_a] - self.registers[reg_b]
                 self.program_counter += 4
-            # elif curr_opcode == 0b00011:  # bsl
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b00100:  # bsr
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b00101:  # or
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b00110:  # xor
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b00111:  # and
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b01000:  # not
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b01001:  # xnor
-            #     self.program_counter += 2
-            # elif curr_opcode == 0b01010:  # nand
-            #     self.program_counter += 2
+            elif curr_opcode == 0b00011:  # bsl
+                reg_a = self.memory[self.program_counter + 1]
+                reg_b = self.memory[self.program_counter + 2]
+                reg_save = self.memory[self.program_counter + 3]
+                self.registers[reg_save] = self.registers[reg_a] << self.registers[reg_b]
+                self.program_counter += 4
+            elif curr_opcode == 0b00100:  # bsr
+                reg_a = self.memory[self.program_counter + 1]
+                reg_b = self.memory[self.program_counter + 2]
+                reg_save = self.memory[self.program_counter + 3]
+                self.registers[reg_save] = self.registers[reg_a] >> self.registers[reg_b]
+                self.program_counter += 4
+            elif curr_opcode == 0b00101:  # or
+                reg_a = self.memory[self.program_counter + 1]
+                reg_b = self.memory[self.program_counter + 2]
+                reg_save = self.memory[self.program_counter + 3]
+                self.registers[reg_save] = self.registers[reg_a] | self.registers[reg_b]
+                self.program_counter += 4
+            elif curr_opcode == 0b00110:  # xor
+                reg_a = self.memory[self.program_counter + 1]
+                reg_b = self.memory[self.program_counter + 2]
+                reg_save = self.memory[self.program_counter + 3]
+                self.registers[reg_save] = self.registers[reg_a] ^ self.registers[reg_b]
+                self.program_counter += 4
+            elif curr_opcode == 0b00111:  # and
+                reg_a = self.memory[self.program_counter + 1]
+                reg_b = self.memory[self.program_counter + 2]
+                reg_save = self.memory[self.program_counter + 3]
+                self.registers[reg_save] = self.registers[reg_a] & self.registers[reg_b]
+                self.program_counter += 4
+            elif curr_opcode == 0b01000:  # not
+                reg_a = self.memory[self.program_counter + 1]
+                reg_save = self.memory[self.program_counter + 3]
+                self.registers[reg_save] = ~self.registers[reg_a]
+                self.program_counter += 4
+            elif curr_opcode == 0b01001:  # xnor
+                reg_a = self.memory[self.program_counter + 1]
+                reg_b = self.memory[self.program_counter + 2]
+                reg_save = self.memory[self.program_counter + 3]
+                self.registers[reg_save] = ~(self.registers[reg_a] ^ self.registers[reg_b])
+                self.program_counter += 4
+            elif curr_opcode == 0b01010:  # nand
+                reg_a = self.memory[self.program_counter + 1]
+                reg_b = self.memory[self.program_counter + 2]
+                reg_save = self.memory[self.program_counter + 3]
+                self.registers[reg_save] = ~(self.registers[reg_a] & self.registers[reg_b])
+                self.program_counter += 4
             elif curr_opcode == 0b01011:  # memw
                 reg_addr = self.memory[self.program_counter + 1]
                 reg_value = self.memory[self.program_counter + 2]
