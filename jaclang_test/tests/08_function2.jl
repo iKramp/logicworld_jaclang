@@ -1,4 +1,4 @@
-/// expect 120
+/// expect 140
 
 // more intense function test
 
@@ -21,14 +21,14 @@ func function3() { // should return 40
     return b - a
 }
 
-func function4() { // should return 100
+func function4() { // should return 120
     var b = function3()
-    var a = 60
+    var a = 80
     return a + b
 }
 
 func main() {
     var a = 20
-    var b = function1()
+    var b = function4()
     return a + b
 }

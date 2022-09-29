@@ -5,6 +5,7 @@ class VirtualMachine:
         self.stack_pointer = 0
         self.program_counter = 0
         self.cycle_count = 0
+        self.max_stack = 0
 
     def getMemorySize(self):
         return len(self.memory)
@@ -13,6 +14,7 @@ class VirtualMachine:
         self.memory[self.stack_pointer] = value & 0xFF
         self.memory[self.stack_pointer + 1] = (value >> 8) & 0xFF
         self.stack_pointer += 2
+        self.max_stack = max(self.stack_pointer, self.max_stack)
 
     def popFromStack(self) -> int:
         self.stack_pointer -= 2
@@ -30,6 +32,7 @@ class VirtualMachine:
         self.stack_pointer = len(instructions)
 
         self.cycle_count = 0
+        self.max_stack = 0
         while True:
             curr_opcode = self.memory[self.program_counter]
             if curr_opcode == 0b00000:  # nop

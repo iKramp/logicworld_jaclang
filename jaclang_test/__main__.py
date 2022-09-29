@@ -25,7 +25,7 @@ def main():
             test_count += 1
             if success:
                 success_count += 1
-            print(f"Testing {file} {len(binary_code)}B ... {'SUCCESS' if success else 'FAIL'}")
+            print(f"Testing {file} {len(binary_code)}B, {virtual_machine.getCycleCount()} cycles, ram used {virtual_machine.max_stack}B ... {'SUCCESS' if success else 'FAIL'}")
             if not success:
                 print(f"Test failed: expected {expected_value} but got {virtual_machine.getReturnCode()}")
     print(f"Test results: {success_count} succeeded out of {test_count}")
