@@ -4,6 +4,7 @@ class VirtualMachine:
         self.registers = [0] * 8
         self.stack_pointer = 0
         self.program_counter = 0
+        self.cycle_count = 0
 
     def getMemorySize(self):
         return len(self.memory)
@@ -17,12 +18,18 @@ class VirtualMachine:
         self.stack_pointer -= 2
         return self.memory[self.stack_pointer] + (self.memory[self.stack_pointer + 1] << 8)
 
+    def getReturnCode(self) -> int:
+        return self.registers[6]
+
+    def getCycleCount(self) -> int:
+        return self.cycle_count
+
     def run(self, instructions: list[int]):
         for i in range(len(instructions)):
             self.memory[i] = instructions[i]
         self.stack_pointer = len(instructions)
 
-        cycle_count = 0
+        self.cycle_count = 0
         while True:
             curr_opcode = self.memory[self.program_counter]
             if curr_opcode == 0b00000:  # nop
@@ -111,7 +118,4 @@ class VirtualMachine:
                 print(f"Unknown opcode: {curr_opcode} {curr_opcode:b}")
                 return
 
-            cycle_count += 1
-
-        print(f"Program returned {self.registers[6]}")
-        print(f"Cycles made: {cycle_count}")
+            self.cycle_count += 1
