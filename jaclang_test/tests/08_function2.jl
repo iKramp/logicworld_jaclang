@@ -27,7 +27,12 @@ func function4() { // should return 120
     return a + b
 }
 
+func test_func() {
+    var a = 10
+}
+
 func main() {
+    test_func()
     var a = 20
     var b = function4()
     return a + b

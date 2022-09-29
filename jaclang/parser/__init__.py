@@ -9,7 +9,6 @@ from jaclang.parser import function
 from jaclang.parser import scope
 from jaclang.parser import variable
 from jaclang.parser import expression
-from jaclang.parser import return_statement
 
 
 def parse(tokens: list[Token], debug_output: bool = False) -> list[Instruction]:

@@ -5,16 +5,52 @@ from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, LabelInstruction, PushInstruction, SB_REG, PopInstruction, \
     GetSpInstruction, ADDR_REG, JmpInstruction, ImmediateLabelInstruction, ImmediatePcInstruction, MovInstruction, \
     ImmediateInstruction, RET_REG, AddInstruction, SetSpInstruction
-from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD
+from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD, RETURN_KEYWORD
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
-from jaclang.parser.expression import ValueFactory, ValueBranch
+from jaclang.parser.expression import ValueFactory, ValueBranch, ExpressionBranch, ExpressionFactory
 from jaclang.parser.scope import ScopeFactory, ScopeBranch
 from jaclang.parser.stack_manager import StackManager
 
 
 class FunctionData(SymbolData):
     pass
+
+
+class ReturnStatementBranch(Branch):
+    def __init__(self, value: Optional[ExpressionBranch]):
+        self.value = value
+
+    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> \
+            list[Instruction]:
+        instructions = []
+        if self.value is not None:
+            instructions += self.value.generateInstructions(symbols, stack_manager)
+        instructions += [
+            PopInstruction(ADDR_REG),
+            SetSpInstruction(SB_REG),
+            MovInstruction(ADDR_REG, SB_REG),
+            PopInstruction(ADDR_REG),
+            JmpInstruction(ADDR_REG),
+        ]
+        return instructions
+
+    def printInfo(self, nested_level: int):
+        print('    ' * nested_level, "return:")
+        self.value.printInfo(nested_level + 1)
+
+
+class ReturnStatementFactory(BranchFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+        if tokens[pos] != RETURN_KEYWORD:
+            raise TokenExpectedException(pos, "Expected return keyword")
+
+        pos += 1
+
+        expression_factory = ExpressionFactory()
+        pos, value_branch = expression_factory.parseDontExpect(pos, tokens)
+
+        return pos, ReturnStatementBranch(value_branch)
 
 
 class FunctionDeclarationBranch(Branch):
@@ -44,15 +80,7 @@ class FunctionDeclarationBranch(Branch):
             PushInstruction(ADDR_REG),
         ]
 
-        end_instructions: list[Instruction] = [
-            PopInstruction(ADDR_REG),
-            SetSpInstruction(SB_REG),
-            MovInstruction(ADDR_REG, SB_REG),
-            PopInstruction(ADDR_REG),
-            JmpInstruction(ADDR_REG),
-        ]
-
-        return begin_instructions + body_instructions + end_instructions
+        return begin_instructions + body_instructions
 
 
 class FunctionDeclarationFactory(BranchFactory):
@@ -76,6 +104,7 @@ class FunctionDeclarationFactory(BranchFactory):
         pos += 1
 
         pos, body = ScopeFactory().parseExpect(pos, tokens)
+        body.branches.append(ReturnStatementBranch(None))
 
         return pos, FunctionDeclarationBranch(func_name, body)
 
@@ -129,3 +158,4 @@ class FunctionCallFactory(BranchFactory):
 
 ValueFactory.factories.append(FunctionCallFactory())
 RootFactory.factories.append(FunctionDeclarationFactory())
+ScopeFactory.factories.append(ReturnStatementFactory())
