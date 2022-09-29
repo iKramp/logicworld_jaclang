@@ -38,7 +38,7 @@ Options:
 
         print(f"Binary code size: {len(binary_code)} bytes")
 
-        virtual_machine = VirtualMachine(256 * 4)
+        virtual_machine = VirtualMachine(2**16)
         virtual_machine.run(binary_code)
 
         print(f"Program returned {virtual_machine.getReturnCode()}")

@@ -19,13 +19,15 @@ def main():
                 continue
             expected_value = int(line_tokens[2])
             binary_code = compileJaclang(file_contents, [])
-            virtual_machine = VirtualMachine(256 * 4)
+            virtual_machine = VirtualMachine(2**16)
             virtual_machine.run(binary_code)
             success = virtual_machine.getReturnCode() == expected_value
             test_count += 1
             if success:
                 success_count += 1
-            print(f"Testing {file} with return code {virtual_machine.getReturnCode()} (expected {expected_value}) ... {'SUCCESS' if success else 'FAIL'}")
+            print(f"Testing {file} {len(binary_code)}B ... {'SUCCESS' if success else 'FAIL'}")
+            if not success:
+                print(f"Test failed: expected {expected_value} but got {virtual_machine.getReturnCode()}")
     print(f"Test results: {success_count} succeeded out of {test_count}")
 
 
