@@ -148,20 +148,6 @@ class ImmediateInstruction(Instruction):
         print(f"    {self.reg_save.getInfo()} = {self.value}")
 
 
-class ImmediatePcInstruction(Instruction):
-    def __init__(self, reg_save: RegisterParameter, offset: int):
-        super().__init__("IMM", 0b01101, [], 4)
-        self.reg_save = reg_save
-        self.offset = offset
-
-    def printInfo(self):
-        print(f"    {self.reg_save.getInfo()} = PC + {self.offset}")
-
-    def toBytes(self, curr_addr: int, labels: dict[str, int]) -> list[int]:
-        value = curr_addr + self.offset
-        return [self.opcode] + self.reg_save.toBytes() + Value16Parameter(value).toBytes()
-
-
 class ImmediateLabelInstruction(Instruction):
     def __init__(self, reg_save: RegisterParameter, label_name: str):
         super().__init__("IMM", 0b01101, [], 4)
@@ -171,7 +157,7 @@ class ImmediateLabelInstruction(Instruction):
     def printInfo(self):
         print(f"    {self.reg_save.getInfo()} = label {self.label_name}")
 
-    def toBytes(self, curr_addr: int, labels: dict[str, int]) -> list[int]:
+    def toBytes(self, labels: dict[str, int]) -> list[int]:
         if self.label_name not in labels.keys():
             raise JaclangSyntaxError(-1, f"Undefined symbol '{self.label_name}'")
         value = labels[self.label_name]

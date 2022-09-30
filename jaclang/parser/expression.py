@@ -9,6 +9,7 @@ from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruc
     XnorInstruction, NandInstruction
 from jaclang.lexer import Token, Symbols
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, SymbolData
+from jaclang.parser.id_manager import IdManager
 from jaclang.parser.scope import ScopeFactory
 from jaclang.parser.stack_manager import StackManager
 
@@ -143,15 +144,15 @@ class ExpressionBranch(ValueBranch):
         print('    ' * nested_level, self.expr_operator.name)
         self.value2.printInfo(nested_level)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         instructions = []
 
-        instructions += self.value1.generateInstructions(symbols, stack_manager)
+        instructions += self.value1.generateInstructions(symbols, id_manager, stack_manager)
         instructions += [
             MovInstruction(RET_REG, EXPR_REG),
             PushInstruction(EXPR_REG),
         ]
-        instructions += self.value2.generateInstructions(symbols, stack_manager)
+        instructions += self.value2.generateInstructions(symbols, id_manager, stack_manager)
         instructions += [
             PopInstruction(EXPR_REG),
         ]

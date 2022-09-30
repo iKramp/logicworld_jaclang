@@ -3,12 +3,13 @@ from typing import Optional
 
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, LabelInstruction, PushInstruction, SB_REG, PopInstruction, \
-    GetSpInstruction, ADDR_REG, JmpInstruction, ImmediateLabelInstruction, ImmediatePcInstruction, MovInstruction, \
+    GetSpInstruction, ADDR_REG, JmpInstruction, ImmediateLabelInstruction, MovInstruction, \
     ImmediateInstruction, RET_REG, AddInstruction, SetSpInstruction
 from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ValueFactory, ValueBranch, ExpressionBranch, ExpressionFactory
+from jaclang.parser.id_manager import IdManager
 from jaclang.parser.scope import ScopeFactory, ScopeBranch
 from jaclang.parser.stack_manager import StackManager
 
@@ -21,11 +22,11 @@ class ReturnStatementBranch(Branch):
     def __init__(self, value: Optional[ExpressionBranch]):
         self.value = value
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> \
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> \
             list[Instruction]:
         instructions = []
         if self.value is not None:
-            instructions += self.value.generateInstructions(symbols, stack_manager)
+            instructions += self.value.generateInstructions(symbols, id_manager, stack_manager)
         instructions += [
             PopInstruction(ADDR_REG),
             SetSpInstruction(SB_REG),
@@ -64,12 +65,12 @@ class FunctionDeclarationBranch(Branch):
         print('    ' * nested_level, f"    name: {self.name}")
         self.body.printInfo(nested_level + 1)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, _: Optional[StackManager] = None) -> list[Instruction]:
         symbols[self.name] = FunctionData()
 
         stack_manager = StackManager()
         func_symbols = copy(symbols)
-        body_instructions = self.body.generateInstructions(func_symbols, stack_manager)
+        body_instructions = self.body.generateInstructions(func_symbols, id_manager, stack_manager)
 
         begin_instructions: list[Instruction] = [
             LabelInstruction("f" + self.name),
@@ -117,27 +118,22 @@ class FunctionCallBranch(ValueBranch):
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, f"call: {self.function_name}()")
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, _: Optional[StackManager] = None) -> list[Instruction]:
         if self.function_name not in symbols.keys():
             raise JaclangSyntaxError(-1, f"Symbol '{self.function_name}' undefined")
 
         if type(symbols[self.function_name]) is not FunctionData:
             raise JaclangSyntaxError(-1, f"Symbol '{self.function_name}' is not a function")
 
-        jump_instructions: list[Instruction] = [
+        jmp_label = f"jmp{id_manager.requestId()}"
+        start_instructions: list[Instruction] = [
+            ImmediateLabelInstruction(ADDR_REG, jmp_label),
             PushInstruction(ADDR_REG),
             ImmediateLabelInstruction(ADDR_REG, "f" + self.function_name),
             JmpInstruction(ADDR_REG),
+            LabelInstruction(jmp_label),
         ]
-
-        jump_size = 0
-        for instruction in jump_instructions:
-            jump_size += instruction.length
-
-        start_instructions: list[Instruction] = [
-            ImmediatePcInstruction(ADDR_REG, jump_size + 4),
-        ]
-        return start_instructions + jump_instructions
+        return start_instructions
 
 
 class FunctionCallFactory(BranchFactory):

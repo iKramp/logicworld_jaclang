@@ -1,6 +1,7 @@
 from jaclang.generator import Instruction
 from jaclang.lexer import Token
 from jaclang.parser.expression import ValueFactory
+from jaclang.parser.id_manager import IdManager
 from jaclang.parser.root import RootFactory
 
 # modules
@@ -23,4 +24,5 @@ def parse(tokens: list[Token], debug_output: bool = False) -> list[Instruction]:
         print("---------------------------------")
 
     symbols = {}
-    return root_branch.generateInstructions(symbols)
+    id_manager_ = IdManager()
+    return root_branch.generateInstructions(symbols, id_manager_)

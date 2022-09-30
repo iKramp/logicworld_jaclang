@@ -81,7 +81,7 @@ class Instruction:
                 info += " "
         print(info)
 
-    def toBytes(self, curr_addr: int, labels: dict[str, int]) -> list[int]:
+    def toBytes(self, labels: dict[str, int]) -> list[int]:
         if self.length == 0:
             return []
 
@@ -113,8 +113,6 @@ def generate(instructions: list[Instruction], debug_output: bool = False) -> lis
         instruction.preCompile(curr_addr, labels)
         curr_addr += instruction.length
 
-    curr_addr = 0
     for instruction in instructions:
-        binary_code += instruction.toBytes(curr_addr, labels)
-        curr_addr += instruction.length
+        binary_code += instruction.toBytes(labels)
     return binary_code

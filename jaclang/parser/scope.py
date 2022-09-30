@@ -3,6 +3,7 @@ from typing import Optional
 from jaclang.generator import Instruction
 from jaclang.lexer import Token, Symbols, EndToken
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
+from jaclang.parser.id_manager import IdManager
 from jaclang.parser.stack_manager import StackManager
 
 
@@ -15,10 +16,10 @@ class ScopeBranch(Branch):
         for branch in self.branches:
             branch.printInfo(nested_level + 1)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         instructions = []
         for branch in self.branches:
-            instructions += branch.generateInstructions(symbols, stack_manager)
+            instructions += branch.generateInstructions(symbols, id_manager, stack_manager)
         return instructions
 
 

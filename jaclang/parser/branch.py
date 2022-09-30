@@ -4,6 +4,7 @@ from typing import Optional
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction
 from jaclang.lexer import Token
+from jaclang.parser.id_manager import IdManager
 from jaclang.parser.stack_manager import StackManager
 
 
@@ -13,7 +14,7 @@ class SymbolData:
 
 class Branch:
     @abstractmethod
-    def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         pass
 
     @abstractmethod

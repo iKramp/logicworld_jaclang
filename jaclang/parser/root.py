@@ -1,9 +1,10 @@
 from typing import Optional
 
-from jaclang.generator import Instruction, NopInstruction, ImmediatePcInstruction, JmpInstruction, PushInstruction, \
-    ImmediateLabelInstruction, ADDR_REG, GetSpInstruction, SB_REG
+from jaclang.generator import Instruction, NopInstruction, JmpInstruction, PushInstruction, \
+    ImmediateLabelInstruction, ADDR_REG, GetSpInstruction, SB_REG, LabelInstruction
 from jaclang.lexer import Token, EndToken
 from jaclang.parser.branch import Branch, BranchFactory, SymbolData
+from jaclang.parser.id_manager import IdManager
 from jaclang.parser.stack_manager import StackManager
 
 
@@ -15,29 +16,21 @@ class RootBranch(Branch):
         for branch in self.branches:
             branch.printInfo(nested_level)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], _: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         instructions = []
         for branch in self.branches:
-            instructions += branch.generateInstructions(symbols)
-
-        jump_instructions: list[Instruction] = [
-            PushInstruction(ADDR_REG),
-            ImmediateLabelInstruction(ADDR_REG, "fmain"),
-            JmpInstruction(ADDR_REG),
-        ]
-
-        jump_size = 0
-        for instruction in jump_instructions:
-            jump_size += instruction.length
+            instructions += branch.generateInstructions(symbols, id_manager)
 
         start_instructions: list[Instruction] = [
             GetSpInstruction(SB_REG),
-            ImmediatePcInstruction(ADDR_REG, jump_size + 4),
-        ]
-
-        start_instructions += jump_instructions + [
+            ImmediateLabelInstruction(ADDR_REG, "end_program"),
+            PushInstruction(ADDR_REG),
+            ImmediateLabelInstruction(ADDR_REG, "fmain"),
+            JmpInstruction(ADDR_REG),
+            LabelInstruction("end_program"),
             NopInstruction(),
         ]
+
         return start_instructions + instructions
 
 
