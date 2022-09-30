@@ -1,7 +1,7 @@
 from typing import Optional
 
 from jaclang.generator import Instruction
-from jaclang.lexer import Token, LEFT_BRACE, RIGHT_BRACE, EndToken
+from jaclang.lexer import Token, Symbols, EndToken
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.stack_manager import StackManager
 
@@ -26,12 +26,12 @@ class ScopeFactory(BranchFactory):
     factories = []
 
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
-        if pos >= len(tokens) or tokens[pos] != LEFT_BRACE:
+        if pos >= len(tokens) or tokens[pos] != Symbols.LEFT_BRACE:
             raise TokenExpectedException(tokens[pos].pos, "Expected '{' at beginning of scope")
         pos += 1
 
         branches = []
-        while tokens[pos] != RIGHT_BRACE:
+        while tokens[pos] != Symbols.RIGHT_BRACE:
             recognized = False
             for factory in ScopeFactory.factories:
                 pos, branch = factory.parseDontExpect(pos, tokens)

@@ -5,7 +5,7 @@ from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, LabelInstruction, PushInstruction, SB_REG, PopInstruction, \
     GetSpInstruction, ADDR_REG, JmpInstruction, ImmediateLabelInstruction, ImmediatePcInstruction, MovInstruction, \
     ImmediateInstruction, RET_REG, AddInstruction, SetSpInstruction
-from jaclang.lexer import Token, IdentifierToken, LEFT_BRACKET, RIGHT_BRACKET, FUNC_KEYWORD, RETURN_KEYWORD
+from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ValueFactory, ValueBranch, ExpressionBranch, ExpressionFactory
@@ -43,7 +43,7 @@ class ReturnStatementBranch(Branch):
 
 class ReturnStatementFactory(BranchFactory):
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
-        if tokens[pos] != RETURN_KEYWORD:
+        if tokens[pos] != Keywords.RETURN:
             raise TokenExpectedException(pos, "Expected return keyword")
 
         pos += 1
@@ -86,7 +86,7 @@ class FunctionDeclarationBranch(Branch):
 
 class FunctionDeclarationFactory(BranchFactory):
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
-        if tokens[pos] != FUNC_KEYWORD:
+        if tokens[pos] != Keywords.FUNC:
             raise TokenExpectedException(tokens[pos].pos, "Expected func keyword in function declaration")
 
         pos += 1
@@ -95,11 +95,11 @@ class FunctionDeclarationFactory(BranchFactory):
         func_name = tokens[pos].identifier
 
         pos += 1
-        if tokens[pos] != LEFT_BRACKET:
+        if tokens[pos] != Symbols.LEFT_BRACKET:
             raise TokenNeededException(tokens[pos].pos, "Expected '(' after func name")
 
         pos += 1
-        if tokens[pos] != RIGHT_BRACKET:
+        if tokens[pos] != Symbols.RIGHT_BRACKET:
             raise TokenNeededException(tokens[pos].pos, "Expected ')' after '('")
 
         pos += 1
@@ -146,11 +146,11 @@ class FunctionCallFactory(BranchFactory):
             raise TokenExpectedException(tokens[pos].pos, "Expected identifier")
         function_name = tokens[pos].identifier
         pos += 1
-        if tokens[pos] != LEFT_BRACKET:
+        if tokens[pos] != Symbols.LEFT_BRACKET:
             raise TokenExpectedException(tokens[pos].pos, "Expected '('")
 
         pos += 1
-        if tokens[pos] != RIGHT_BRACKET:
+        if tokens[pos] != Symbols.RIGHT_BRACKET:
             raise TokenNeededException(tokens[pos].pos, "Expected ')'")
 
         pos += 1

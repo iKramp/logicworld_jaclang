@@ -6,8 +6,7 @@ from typing import Optional
 from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruction, AddInstruction, RET_REG, \
     SubInstruction, MovInstruction, CmpInstruction, CMP_EQUAL, CMP_LESSER, CMP_GREATER, CMP_LESSER_OR_EQUAL, \
     CMP_GREATER_OR_EQUAL, CMP_NOT_EQUAL
-from jaclang.lexer import Token, PLUS, MINUS, LEFT_BRACKET, RIGHT_BRACKET, EQUALS, LESS_THAN, GREATER_THAN, \
-    LESS_OR_EQUAL_THAN, GREATER_OR_EQUAL_THAN, NOT_EQUAL
+from jaclang.lexer import Token, Symbols
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, SymbolData
 from jaclang.parser.scope import ScopeFactory
 from jaclang.parser.stack_manager import StackManager
@@ -88,14 +87,14 @@ class NotEqualOperator(Operator):
         return [CmpInstruction(EXPR_REG, RET_REG, CMP_NOT_EQUAL)]
 
 
-Operator.operators[PLUS] = PlusOperator()
-Operator.operators[MINUS] = MinusOperator()
-Operator.operators[EQUALS] = EqualsOperator()
-Operator.operators[LESS_THAN] = LesserOperator()
-Operator.operators[GREATER_THAN] = GreaterOperator()
-Operator.operators[LESS_OR_EQUAL_THAN] = LesserOrEqualOperator()
-Operator.operators[GREATER_OR_EQUAL_THAN] = GreaterOrEqualOperator()
-Operator.operators[NOT_EQUAL] = NotEqualOperator()
+Operator.operators[Symbols.PLUS] = PlusOperator()
+Operator.operators[Symbols.MINUS] = MinusOperator()
+Operator.operators[Symbols.EQUALS] = EqualsOperator()
+Operator.operators[Symbols.LESS_THAN] = LesserOperator()
+Operator.operators[Symbols.GREATER_THAN] = GreaterOperator()
+Operator.operators[Symbols.LESS_OR_EQUAL_THAN] = LesserOrEqualOperator()
+Operator.operators[Symbols.GREATER_OR_EQUAL_THAN] = GreaterOrEqualOperator()
+Operator.operators[Symbols.NOT_EQUAL] = NotEqualOperator()
 
 
 class ValueBranch(Branch, ABC):
@@ -167,7 +166,7 @@ class ExpressionFactory(BranchFactory):
 
 class ParenthesesFactory(BranchFactory):
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
-        if tokens[pos] != LEFT_BRACKET:
+        if tokens[pos] != Symbols.LEFT_BRACKET:
             raise TokenExpectedException(tokens[pos].pos, "Expected '('")
 
         pos += 1
@@ -175,7 +174,7 @@ class ParenthesesFactory(BranchFactory):
         expr_factory = ExpressionFactory()
         pos, expr = expr_factory.parseExpect(pos, tokens)
 
-        if tokens[pos] != RIGHT_BRACKET:
+        if tokens[pos] != Symbols.RIGHT_BRACKET:
             raise TokenExpectedException(tokens[pos].pos, "Expected ')'")
 
         pos += 1

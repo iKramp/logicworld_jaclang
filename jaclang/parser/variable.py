@@ -2,7 +2,7 @@ from typing import Optional
 
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, MemwInstruction, RET_REG, SB_REG, MemrInstruction
-from jaclang.lexer import Token, VAR_KEYWORD, IdentifierToken, ASSIGNMENT
+from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory, ValueFactory, ValueBranch
 from jaclang.parser.scope import ScopeFactory
@@ -48,7 +48,7 @@ class VariableAssignmentFactory(BranchFactory):
         variable_name = tokens[pos].identifier
 
         pos += 1
-        if tokens[pos] != ASSIGNMENT:
+        if tokens[pos] != Symbols.ASSIGNMENT:
             raise TokenExpectedException(tokens[pos].pos, "Expected '='")
         pos += 1
         expression_factory = ExpressionFactory()
@@ -79,7 +79,7 @@ class VariableDeclarationBranch(Branch):
 
 class VariableDeclarationFactory(BranchFactory):
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
-        if tokens[pos] != VAR_KEYWORD:
+        if tokens[pos] != Keywords.VAR:
             raise TokenExpectedException(tokens[pos].pos, "Expected var keyword")
 
         pos += 1
@@ -88,7 +88,7 @@ class VariableDeclarationFactory(BranchFactory):
         variable_name = tokens[pos].identifier
 
         pos += 1
-        if tokens[pos] == ASSIGNMENT:
+        if tokens[pos] == Symbols.ASSIGNMENT:
             pos += 1
             expression_factory = ExpressionFactory()
             pos, value = expression_factory.parseExpect(pos, tokens)
