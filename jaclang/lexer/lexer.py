@@ -104,15 +104,7 @@ class EndToken(Token):
 
 
 class Symbols:
-    LEFT_BRACKET = SymbolToken("LEFT_BRACKET", "(")
-    RIGHT_BRACKET = SymbolToken("RIGHT_BRACKET", ")")
-    ASSIGNMENT = SymbolToken("ASSIGNMENT", "=")
-    EQUALS = SymbolToken("EQUALS", "==")
-    LESS_THAN = SymbolToken("LESS_THAN", "<")
-    GREATER_THAN = SymbolToken("GREATER_THAN", ">")
-    LESS_OR_EQUAL_THAN = SymbolToken("LESS_OR_EQUAL_THAN", "<=")
-    GREATER_OR_EQUAL_THAN = SymbolToken("GREATER_OR_EQUAL_THAN", ">=")
-    NOT_EQUAL = SymbolToken("NOT_EQUAL", "!=")
+    # Operators
     BIT_SHIFT_LEFT = SymbolToken("BIT_SHIFT_LEFT", "<<")
     BIT_SHIFT_RIGHT = SymbolToken("BIT_SHIFT_LEFT", ">>")
     OR = SymbolToken("OR", "|")
@@ -120,16 +112,30 @@ class Symbols:
     AND = SymbolToken("AND", "&")
     XNOR = SymbolToken("XNOR", "!^")
     NAND = SymbolToken("NAND", "!&")
-    LEFT_BRACE = SymbolToken("LEFT_BRACE", "{")
-    RIGHT_BRACE = SymbolToken("RIGHT_BRACE", "}")
-    SQUARE_LEFT_BRACKET = SymbolToken("SQUARE_LEFT_BRACKET", "[")
-    SQUARE_RIGHT_BRACKET = SymbolToken("SQUARE_RIGHT_BRACKET", "]")
     INCREMENT = SymbolToken("INCREMENT", "++")
     DECREMENT = SymbolToken("DECREMENT", "--")
     INCREMENT_BY = SymbolToken("INCREMENT_BY", "+=")
     DECREMENT_BY = SymbolToken("DECREMENT_BY", "-=")
     PLUS = SymbolToken("PLUS", "+")
     MINUS = SymbolToken("MINUS", "-")
+
+    # Comparisons
+    EQUALS = SymbolToken("EQUALS", "==")
+    LESS_OR_EQUAL_THAN = SymbolToken("LESS_OR_EQUAL_THAN", "<=")
+    GREATER_OR_EQUAL_THAN = SymbolToken("GREATER_OR_EQUAL_THAN", ">=")
+    NOT_EQUAL = SymbolToken("NOT_EQUAL", "!=")
+    ASSIGNMENT = SymbolToken("ASSIGNMENT", "=")
+    LESS_THAN = SymbolToken("LESS_THAN", "<")
+    GREATER_THAN = SymbolToken("GREATER_THAN", ">")
+
+    # Symbols
+    LEFT_BRACKET = SymbolToken("LEFT_BRACKET", "(")
+    RIGHT_BRACKET = SymbolToken("RIGHT_BRACKET", ")")
+    LEFT_BRACE = SymbolToken("LEFT_BRACE", "{")
+    RIGHT_BRACE = SymbolToken("RIGHT_BRACE", "}")
+    SQUARE_LEFT_BRACKET = SymbolToken("SQUARE_LEFT_BRACKET", "[")
+    SQUARE_RIGHT_BRACKET = SymbolToken("SQUARE_RIGHT_BRACKET", "]")
+    COLON = SymbolToken("COLON", ":")
 
 
 class Keywords:
@@ -150,6 +156,7 @@ def tokenize(code: str, debug_output: bool = False) -> list[Token]:
         for symbol in SymbolToken.symbols:
             if symbol.identifier != "" and code.startswith(symbol.identifier, i):
                 curr_symbol = copy(symbol)
+                break
 
         if code[i] == ' ' or curr_symbol is not None:
             if curr_token != "":
