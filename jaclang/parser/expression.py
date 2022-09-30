@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from jaclang.generator import Instruction, Instructions, CompareFlags, Registers
 from jaclang.lexer import Token, Symbols
-from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, SymbolData
 from jaclang.parser.id_manager import IdManager
-from jaclang.parser.scope import ScopeFactory
+from jaclang.parser.root import SymbolData
+from jaclang.parser.scope import ScopeFactory, BranchInScope, BranchInScopeFactory, TokenExpectedException
 from jaclang.parser.stack_manager import StackManager
 
 
@@ -114,14 +113,14 @@ Operator.operators[Symbols.XNOR] = XnorOperator(Symbols.XNOR.name)
 Operator.operators[Symbols.NAND] = NandOperator(Symbols.NAND.name)
 
 
-class ValueBranch(Branch, ABC):
+class ValueBranch(BranchInScope, ABC):
     pass
 
 
-class ValueFactory(BranchFactory):
+class ValueFactory(BranchInScopeFactory):
     factories = []
 
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         for factory in ValueFactory.factories:
             pos, value = factory.parseDontExpect(pos, tokens)
             if value is not None:
@@ -141,7 +140,7 @@ class ExpressionBranch(ValueBranch):
         print('    ' * nested_level, self.expr_operator.name)
         self.value2.printInfo(nested_level)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: StackManager) -> list[Instruction]:
         instructions = []
 
         instructions += self.value1.generateInstructions(symbols, id_manager, stack_manager)
@@ -159,8 +158,8 @@ class ExpressionBranch(ValueBranch):
         return instructions
 
 
-class ExpressionFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class ExpressionFactory(BranchInScopeFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         value_factory = ValueFactory()
         pos, value = value_factory.parseDontExpect(pos, tokens)
         if value is None:
@@ -181,8 +180,8 @@ class ExpressionFactory(BranchFactory):
         return self.parseRecursive(pos, tokens, new_expr_branch)
 
 
-class ParenthesesFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class ParenthesesFactory(BranchInScopeFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         if tokens[pos] != Symbols.LEFT_BRACKET:
             raise TokenExpectedException(tokens[pos].pos, "Expected '('")
 

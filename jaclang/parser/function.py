@@ -5,10 +5,11 @@ from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
 from jaclang.parser import RootFactory
-from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ValueFactory, ValueBranch, ExpressionBranch, ExpressionFactory
 from jaclang.parser.id_manager import IdManager
-from jaclang.parser.scope import ScopeFactory, ScopeBranch
+from jaclang.parser.root import SymbolData, BranchInRoot, BranchInRootFactory
+from jaclang.parser.scope import ScopeFactory, ScopeBranch, BranchInScope, BranchInScopeFactory, TokenExpectedException, \
+    TokenNeededException
 from jaclang.parser.stack_manager import StackManager
 
 
@@ -16,7 +17,7 @@ class FunctionData(SymbolData):
     pass
 
 
-class ReturnStatementBranch(Branch):
+class ReturnStatementBranch(BranchInScope):
     def __init__(self, value: Optional[ExpressionBranch]):
         self.value = value
 
@@ -40,8 +41,8 @@ class ReturnStatementBranch(Branch):
             self.value.printInfo(nested_level + 1)
 
 
-class ReturnStatementFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class ReturnStatementFactory(BranchInScopeFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScopeFactory):
         if tokens[pos] != Keywords.RETURN:
             raise TokenExpectedException(pos, "Expected return keyword")
 
@@ -53,7 +54,7 @@ class ReturnStatementFactory(BranchFactory):
         return pos, ReturnStatementBranch(value_branch)
 
 
-class FunctionDeclarationBranch(Branch):
+class FunctionDeclarationBranch(BranchInRoot):
     def __init__(self, name: str, body: ScopeBranch):
         self.name = name
         self.body = body
@@ -63,7 +64,7 @@ class FunctionDeclarationBranch(Branch):
         print('    ' * nested_level, f"    name: {self.name}")
         self.body.printInfo(nested_level + 1)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, _: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager) -> list[Instruction]:
         symbols[self.name] = FunctionData()
 
         stack_manager = StackManager()
@@ -83,8 +84,8 @@ class FunctionDeclarationBranch(Branch):
         return begin_instructions + body_instructions
 
 
-class FunctionDeclarationFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class FunctionDeclarationFactory(BranchInRootFactory):
+    def parse(self, pos: int, tokens: list[Token]) -> (int, BranchInRoot):
         if tokens[pos] != Keywords.FUNC:
             raise TokenExpectedException(tokens[pos].pos, "Expected func keyword in function declaration")
 
@@ -134,8 +135,8 @@ class FunctionCallBranch(ValueBranch):
         return start_instructions
 
 
-class FunctionCallFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class FunctionCallFactory(BranchInScopeFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         if type(tokens[pos]) is not IdentifierToken:
             raise TokenExpectedException(tokens[pos].pos, "Expected identifier")
         function_name = tokens[pos].identifier

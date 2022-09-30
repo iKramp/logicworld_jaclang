@@ -15,7 +15,7 @@ from jaclang.parser import expression
 def parse(tokens: list[Token], debug_output: bool = False) -> list[Instruction]:
     root_factory = RootFactory()
 
-    _, root_branch = root_factory.parseImpl(0, tokens)
+    _, root_branch = root_factory.parse(0, tokens)
 
     if debug_output:
         print("Generated abstract syntax tree:")
@@ -23,6 +23,4 @@ def parse(tokens: list[Token], debug_output: bool = False) -> list[Instruction]:
         root_branch.printInfo(0)
         print("---------------------------------")
 
-    symbols = {}
-    id_manager_ = IdManager()
-    return root_branch.generateInstructions(symbols, id_manager_)
+    return root_branch.generateInstructions()

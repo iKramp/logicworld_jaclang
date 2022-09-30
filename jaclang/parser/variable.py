@@ -3,10 +3,11 @@ from typing import Optional
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
-from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory, ValueFactory, ValueBranch
 from jaclang.parser.id_manager import IdManager
-from jaclang.parser.scope import ScopeFactory
+from jaclang.parser.root import SymbolData
+from jaclang.parser.scope import ScopeFactory, BranchInScope, BranchInScopeFactory, TokenExpectedException, \
+    TokenNeededException
 from jaclang.parser.stack_manager import StackManager
 
 
@@ -15,7 +16,7 @@ class VariableData(SymbolData):
         self.pos_on_stack = pos_on_stack
 
 
-class VariableAssignmentBranch(Branch):
+class VariableAssignmentBranch(BranchInScope):
     def __init__(self, variable_name: str, value: Optional[ExpressionBranch]):
         self.variable_name = variable_name
         self.value = value
@@ -42,8 +43,8 @@ class VariableAssignmentBranch(Branch):
             self.value.printInfo(nested_level + 1)
 
 
-class VariableAssignmentFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class VariableAssignmentFactory(BranchInScopeFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         if type(tokens[pos]) is not IdentifierToken:
             raise TokenExpectedException(tokens[pos].pos, "Expected variable name after var keyword")
         variable_name = tokens[pos].identifier
@@ -57,7 +58,7 @@ class VariableAssignmentFactory(BranchFactory):
         return pos, VariableAssignmentBranch(variable_name, value)
 
 
-class VariableDeclarationBranch(Branch):
+class VariableDeclarationBranch(BranchInScope):
     def __init__(self, variable_name: str, value: Optional[ValueBranch]):
         self.variable_name = variable_name
         self.assignment = VariableAssignmentBranch(variable_name, value)
@@ -78,8 +79,8 @@ class VariableDeclarationBranch(Branch):
             self.assignment.value.printInfo(nested_level + 1)
 
 
-class VariableDeclarationFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class VariableDeclarationFactory(BranchInScopeFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         if tokens[pos] != Keywords.VAR:
             raise TokenExpectedException(tokens[pos].pos, "Expected var keyword")
 
@@ -117,8 +118,8 @@ class VariableBranch(ValueBranch):
         ]
 
 
-class VariableFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class VariableFactory(BranchInScopeFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         if type(tokens[pos]) is not IdentifierToken:
             raise TokenExpectedException(tokens[pos].pos, "Expected identifier")
         variable_name = tokens[pos].identifier

@@ -2,9 +2,10 @@ from typing import Optional
 
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, ConstantToken
-from jaclang.parser.branch import BranchFactory, Branch, TokenExpectedException, SymbolData
 from jaclang.parser.expression import ValueBranch, ValueFactory
 from jaclang.parser.id_manager import IdManager
+from jaclang.parser.root import SymbolData
+from jaclang.parser.scope import BranchInScopeFactory, TokenExpectedException, BranchInScope
 from jaclang.parser.stack_manager import StackManager
 
 
@@ -19,8 +20,8 @@ class IntegerBranch(ValueBranch):
         return [Instructions.Immediate(Registers.RETURN, self.value)]
 
 
-class IntegerFactory(BranchFactory):
-    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, Branch):
+class IntegerFactory(BranchInScopeFactory):
+    def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         if type(tokens[pos]) is not ConstantToken:
             raise TokenExpectedException(tokens[pos].pos, "Expected integer")
         value = tokens[pos].value
