@@ -5,7 +5,8 @@ from typing import Optional
 
 from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruction, AddInstruction, RET_REG, \
     SubInstruction, MovInstruction, CmpInstruction, CMP_EQUAL, CMP_LESSER, CMP_GREATER, CMP_LESSER_OR_EQUAL, \
-    CMP_GREATER_OR_EQUAL, CMP_NOT_EQUAL
+    CMP_GREATER_OR_EQUAL, CMP_NOT_EQUAL, BsrInstruction, BslInstruction, OrInstruction, XorInstruction, AndInstruction, \
+    XnorInstruction, NandInstruction
 from jaclang.lexer import Token, Symbols
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, SymbolData
 from jaclang.parser.scope import ScopeFactory
@@ -24,77 +25,95 @@ class Operator:
 
 
 class PlusOperator(Operator):
-    def __init__(self):
-        super().__init__("+")
-
     def generateInstructions(self) -> list[Instruction]:
         return [AddInstruction(EXPR_REG, RET_REG, RET_REG)]
 
 
 class MinusOperator(Operator):
-    def __init__(self):
-        super().__init__("-")
-
     def generateInstructions(self) -> list[Instruction]:
         return [SubInstruction(RET_REG, EXPR_REG, RET_REG)]
 
 
 class EqualsOperator(Operator):
-    def __init__(self):
-        super().__init__("==")
-
     def generateInstructions(self) -> list[Instruction]:
         return [CmpInstruction(EXPR_REG, RET_REG, CMP_EQUAL)]
 
 
 class LesserOperator(Operator):
-    def __init__(self):
-        super().__init__("<")
-
     def generateInstructions(self) -> list[Instruction]:
         return [CmpInstruction(EXPR_REG, RET_REG, CMP_LESSER)]
 
 
 class GreaterOperator(Operator):
-    def __init__(self):
-        super().__init__(">")
-
     def generateInstructions(self) -> list[Instruction]:
         return [CmpInstruction(EXPR_REG, RET_REG, CMP_GREATER)]
 
 
 class LesserOrEqualOperator(Operator):
-    def __init__(self):
-        super().__init__("<=")
-
     def generateInstructions(self) -> list[Instruction]:
         return [CmpInstruction(EXPR_REG, RET_REG, CMP_LESSER_OR_EQUAL)]
 
 
 class GreaterOrEqualOperator(Operator):
-    def __init__(self):
-        super().__init__(">=")
-
     def generateInstructions(self) -> list[Instruction]:
         return [CmpInstruction(EXPR_REG, RET_REG, CMP_GREATER_OR_EQUAL)]
 
 
 class NotEqualOperator(Operator):
-    def __init__(self):
-        super().__init__("!=")
-
     def generateInstructions(self) -> list[Instruction]:
         return [CmpInstruction(EXPR_REG, RET_REG, CMP_NOT_EQUAL)]
 
 
-Operator.operators[Symbols.PLUS] = PlusOperator()
-Operator.operators[Symbols.MINUS] = MinusOperator()
-Operator.operators[Symbols.EQUALS] = EqualsOperator()
-Operator.operators[Symbols.LESS_THAN] = LesserOperator()
-Operator.operators[Symbols.GREATER_THAN] = GreaterOperator()
-Operator.operators[Symbols.LESS_OR_EQUAL_THAN] = LesserOrEqualOperator()
-Operator.operators[Symbols.GREATER_OR_EQUAL_THAN] = GreaterOrEqualOperator()
-Operator.operators[Symbols.NOT_EQUAL] = NotEqualOperator()
+class BitShiftLeftOperator(Operator):
+    def generateInstructions(self) -> list[Instruction]:
+        return [BslInstruction(EXPR_REG, RET_REG, RET_REG)]
+
+
+class BitShiftRightOperator(Operator):
+    def generateInstructions(self) -> list[Instruction]:
+        return [BsrInstruction(EXPR_REG, RET_REG, RET_REG)]
+
+
+class OrOperator(Operator):
+    def generateInstructions(self) -> list[Instruction]:
+        return [OrInstruction(EXPR_REG, RET_REG, RET_REG)]
+
+
+class XorOperator(Operator):
+    def generateInstructions(self) -> list[Instruction]:
+        return [XorInstruction(EXPR_REG, RET_REG, RET_REG)]
+
+
+class AndOperator(Operator):
+    def generateInstructions(self) -> list[Instruction]:
+        return [AndInstruction(EXPR_REG, RET_REG, RET_REG)]
+
+
+class XnorOperator(Operator):
+    def generateInstructions(self) -> list[Instruction]:
+        return [XnorInstruction(EXPR_REG, RET_REG, RET_REG)]
+
+
+class NandOperator(Operator):
+    def generateInstructions(self) -> list[Instruction]:
+        return [NandInstruction(EXPR_REG, RET_REG, RET_REG)]
+
+
+Operator.operators[Symbols.PLUS] = PlusOperator(Symbols.PLUS.name)
+Operator.operators[Symbols.MINUS] = MinusOperator(Symbols.MINUS.name)
+Operator.operators[Symbols.EQUALS] = EqualsOperator(Symbols.EQUALS.name)
+Operator.operators[Symbols.LESS_THAN] = LesserOperator(Symbols.LESS_THAN.name)
+Operator.operators[Symbols.GREATER_THAN] = GreaterOperator(Symbols.GREATER_THAN.name)
+Operator.operators[Symbols.LESS_OR_EQUAL_THAN] = LesserOrEqualOperator(Symbols.LESS_OR_EQUAL_THAN.name)
+Operator.operators[Symbols.GREATER_OR_EQUAL_THAN] = GreaterOrEqualOperator(Symbols.GREATER_OR_EQUAL_THAN.name)
+Operator.operators[Symbols.NOT_EQUAL] = NotEqualOperator(Symbols.NOT_EQUAL.name)
+Operator.operators[Symbols.BIT_SHIFT_LEFT] = BitShiftLeftOperator(Symbols.BIT_SHIFT_LEFT.name)
+Operator.operators[Symbols.BIT_SHIFT_RIGHT] = BitShiftRightOperator(Symbols.BIT_SHIFT_RIGHT.name)
+Operator.operators[Symbols.OR] = OrOperator(Symbols.OR.name)
+Operator.operators[Symbols.XOR] = XorOperator(Symbols.XOR.name)
+Operator.operators[Symbols.AND] = AndOperator(Symbols.AND.name)
+Operator.operators[Symbols.XNOR] = XnorOperator(Symbols.XNOR.name)
+Operator.operators[Symbols.NAND] = NandOperator(Symbols.NAND.name)
 
 
 class ValueBranch(Branch, ABC):
