@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Optional
 
 from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruction, AddInstruction, RET_REG, \
-    SubInstruction, MovInstruction
-from jaclang.lexer import Token, PLUS, MINUS, SymbolToken, UNKNOWN, LEFT_BRACKET, RIGHT_BRACKET
+    SubInstruction, MovInstruction, CmpInstruction, CMP_EQUAL, CMP_LESSER, CMP_GREATER, CMP_LESSER_OR_EQUAL, \
+    CMP_GREATER_OR_EQUAL, CMP_NOT_EQUAL
+from jaclang.lexer import Token, PLUS, MINUS, LEFT_BRACKET, RIGHT_BRACKET, EQUALS, LESS_THAN, GREATER_THAN, \
+    LESS_OR_EQUAL_THAN, GREATER_OR_EQUAL_THAN, NOT_EQUAL
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, SymbolData
 from jaclang.parser.scope import ScopeFactory
 from jaclang.parser.stack_manager import StackManager
@@ -14,13 +16,86 @@ from jaclang.parser.stack_manager import StackManager
 class Operator:
     operators = {}
 
-    def __init__(self, name: str, token: SymbolToken):
+    def __init__(self, name: str):
         self.name = name
-        Operator.operators[token] = self
+
+    @abstractmethod
+    def generateInstructions(self) -> list[Instruction]:
+        pass
 
 
-PLUS_OPERATOR = Operator("+", PLUS)
-MINUS_OPERATOR = Operator("-", MINUS)
+class PlusOperator(Operator):
+    def __init__(self):
+        super().__init__("+")
+
+    def generateInstructions(self) -> list[Instruction]:
+        return [AddInstruction(EXPR_REG, RET_REG, RET_REG)]
+
+
+class MinusOperator(Operator):
+    def __init__(self):
+        super().__init__("-")
+
+    def generateInstructions(self) -> list[Instruction]:
+        return [SubInstruction(RET_REG, EXPR_REG, RET_REG)]
+
+
+class EqualsOperator(Operator):
+    def __init__(self):
+        super().__init__("==")
+
+    def generateInstructions(self) -> list[Instruction]:
+        return [CmpInstruction(EXPR_REG, RET_REG, CMP_EQUAL)]
+
+
+class LesserOperator(Operator):
+    def __init__(self):
+        super().__init__("<")
+
+    def generateInstructions(self) -> list[Instruction]:
+        return [CmpInstruction(EXPR_REG, RET_REG, CMP_LESSER)]
+
+
+class GreaterOperator(Operator):
+    def __init__(self):
+        super().__init__(">")
+
+    def generateInstructions(self) -> list[Instruction]:
+        return [CmpInstruction(EXPR_REG, RET_REG, CMP_GREATER)]
+
+
+class LesserOrEqualOperator(Operator):
+    def __init__(self):
+        super().__init__("<=")
+
+    def generateInstructions(self) -> list[Instruction]:
+        return [CmpInstruction(EXPR_REG, RET_REG, CMP_LESSER_OR_EQUAL)]
+
+
+class GreaterOrEqualOperator(Operator):
+    def __init__(self):
+        super().__init__(">=")
+
+    def generateInstructions(self) -> list[Instruction]:
+        return [CmpInstruction(EXPR_REG, RET_REG, CMP_GREATER_OR_EQUAL)]
+
+
+class NotEqualOperator(Operator):
+    def __init__(self):
+        super().__init__("!=")
+
+    def generateInstructions(self) -> list[Instruction]:
+        return [CmpInstruction(EXPR_REG, RET_REG, CMP_NOT_EQUAL)]
+
+
+Operator.operators[PLUS] = PlusOperator()
+Operator.operators[MINUS] = MinusOperator()
+Operator.operators[EQUALS] = EqualsOperator()
+Operator.operators[LESS_THAN] = LesserOperator()
+Operator.operators[GREATER_THAN] = GreaterOperator()
+Operator.operators[LESS_OR_EQUAL_THAN] = LesserOrEqualOperator()
+Operator.operators[GREATER_OR_EQUAL_THAN] = GreaterOrEqualOperator()
+Operator.operators[NOT_EQUAL] = NotEqualOperator()
 
 
 class ValueBranch(Branch, ABC):
@@ -51,28 +126,20 @@ class ExpressionBranch(ValueBranch):
         self.value2.printInfo(nested_level)
 
     def generateInstructions(self, symbols: dict[str, SymbolData], stack_manager: Optional[StackManager] = None) -> list[Instruction]:
-        instructions = [
-            PushInstruction(EXPR_REG),
-        ]
+        instructions = []
 
         instructions += self.value1.generateInstructions(symbols, stack_manager)
         instructions += [
             MovInstruction(RET_REG, EXPR_REG),
+            PushInstruction(EXPR_REG),
         ]
         instructions += self.value2.generateInstructions(symbols, stack_manager)
-
-        if self.expr_operator == PLUS_OPERATOR:
-            instructions += [
-                AddInstruction(EXPR_REG, RET_REG, RET_REG),
-            ]
-        elif self.expr_operator == MINUS_OPERATOR:
-            instructions += [
-                SubInstruction(EXPR_REG, RET_REG, RET_REG),
-            ]
-
         instructions += [
             PopInstruction(EXPR_REG),
         ]
+
+        instructions += self.expr_operator.generateInstructions()
+
         return instructions
 
 

@@ -188,6 +188,14 @@ class MovInstruction(Instruction):
         print(f"    {self.reg_save.getInfo()} = {self.reg_a.getInfo()}")
 
 
+CMP_EQUAL = 0b100
+CMP_GREATER = 0b001
+CMP_LESSER = 0b010
+CMP_LESSER_OR_EQUAL = CMP_LESSER | CMP_EQUAL
+CMP_GREATER_OR_EQUAL = CMP_GREATER | CMP_EQUAL
+CMP_NOT_EQUAL = CMP_GREATER | CMP_LESSER
+
+
 class CmpInstruction(Instruction):
     def __init__(self, reg_a: RegisterParameter, reg_b: RegisterParameter, flags: int):
         super().__init__("CMP", 0b01111, [reg_a, reg_b, Value8Parameter(flags)], 4)
@@ -195,7 +203,12 @@ class CmpInstruction(Instruction):
 
 class JmpInstruction(Instruction):
     def __init__(self, reg: RegisterParameter):
-        super().__init__("JMP", 0b10000, [reg, EmptyByteParameter(), EmptyByteParameter()], 4)
+        super().__init__("JMP", 0b10000, [reg, Value8Parameter(0), EmptyByteParameter()], 4)
+
+
+class JmpifInstruction(Instruction):
+    def __init__(self, reg: RegisterParameter):
+        super().__init__("JMP", 0b10000, [reg, Value8Parameter(1), EmptyByteParameter()], 4)
 
 
 class GpuDrawInstruction(Instruction):

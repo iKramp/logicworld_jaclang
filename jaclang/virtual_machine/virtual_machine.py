@@ -21,7 +21,7 @@ class VirtualMachine:
         return self.memory[self.stack_pointer] + (self.memory[self.stack_pointer + 1] << 8)
 
     def getReturnCode(self) -> int:
-        return self.registers[6]
+        return self.registers[0]
 
     def getCycleCount(self) -> int:
         return self.cycle_count
@@ -47,7 +47,7 @@ class VirtualMachine:
                 reg_a = self.memory[self.program_counter + 1]
                 reg_b = self.memory[self.program_counter + 2]
                 reg_save = self.memory[self.program_counter + 3]
-                self.registers[reg_save] = self.registers[reg_a] - self.registers[reg_b]
+                self.registers[reg_save] = self.registers[reg_b] - self.registers[reg_a]
                 self.program_counter += 4
             elif curr_opcode == 0b00011:  # bsl
                 reg_a = self.memory[self.program_counter + 1]
@@ -123,11 +123,25 @@ class VirtualMachine:
                 reg_save = self.memory[self.program_counter + 3]
                 self.registers[reg_save] = self.registers[reg]
                 self.program_counter += 4
-            # elif curr_opcode == 0b01111:  # cmp
-            #     self.program_counter += 2
+            elif curr_opcode == 0b01111:  # cmp
+                reg1 = self.memory[self.program_counter + 1]
+                reg2 = self.memory[self.program_counter + 2]
+                flags = self.memory[self.program_counter + 3]
+                val1 = self.registers[reg1]
+                val2 = self.registers[reg2]
+                greater = (flags >> 0) % 2 == 1
+                lesser = (flags >> 1) % 2 == 1
+                equal = (flags >> 2) % 2 == 1
+                result = (val1 > val2 and greater) or (val1 < val2 and lesser) or (val1 == val2 and equal)
+                self.registers[0] = 1 if result else 0
+                self.program_counter += 4
             elif curr_opcode == 0b10000:  # jmp
                 reg = self.memory[self.program_counter + 1]
-                self.program_counter = self.registers[reg]
+                cond = self.memory[self.program_counter + 2]
+                if cond == 0 or self.registers[0] == 1:
+                    self.program_counter = self.registers[reg]
+                else:
+                    self.program_counter += 4
             # elif curr_opcode == 0b10001:  # gpudraw
             #     self.program_counter += 2
             # elif curr_opcode == 0b10010:  # gpudisplay

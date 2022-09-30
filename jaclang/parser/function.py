@@ -37,7 +37,8 @@ class ReturnStatementBranch(Branch):
 
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, "return:")
-        self.value.printInfo(nested_level + 1)
+        if self.value is not None:
+            self.value.printInfo(nested_level + 1)
 
 
 class ReturnStatementFactory(BranchFactory):

@@ -23,13 +23,13 @@ class RegisterParameter(Parameter):
         return self.name
 
 
-REG0 = RegisterParameter(0, "R0")
+RET_REG = RegisterParameter(0, "RRET")
 REG1 = RegisterParameter(1, "R1")
 REG2 = RegisterParameter(2, "R2")
 REG3 = RegisterParameter(3, "R3")
-ADDR_REG = RegisterParameter(4, "RADDR")
-EXPR_REG = RegisterParameter(5, "REXPR")
-RET_REG = RegisterParameter(6, "RRET")
+REG4 = RegisterParameter(4, "R4")
+ADDR_REG = RegisterParameter(5, "RADDR")
+EXPR_REG = RegisterParameter(6, "REXPR")
 SB_REG = RegisterParameter(7, "RSB")
 
 

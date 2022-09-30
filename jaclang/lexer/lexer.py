@@ -103,11 +103,10 @@ class EndToken(Token):
         return type(other) is EndToken
 
 
-UNKNOWN = SymbolToken("UNKNOWN", "")
 LEFT_BRACKET = SymbolToken("LEFT_BRACKET", "(")
 RIGHT_BRACKET = SymbolToken("RIGHT_BRACKET", ")")
 ASSIGNMENT = SymbolToken("ASSIGNMENT", "=")
-EQUAL = SymbolToken("EQUAL", "==")
+EQUALS = SymbolToken("EQUALS", "==")
 LESS_THAN = SymbolToken("LESS_THAN", "<")
 GREATER_THAN = SymbolToken("GREATER_THAN", ">")
 LESS_OR_EQUAL_THAN = SymbolToken("LESS_OR_EQUAL_THAN", "<=")
