@@ -2,7 +2,7 @@ from os import listdir
 from os.path import dirname
 
 from jaclang import compileJaclang
-from jaclang.virtual_machine import VirtualMachine
+from virtual_machine import VirtualMachine
 
 
 def main():

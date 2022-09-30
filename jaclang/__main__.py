@@ -5,7 +5,6 @@ from jaclang.generator import generate
 from jaclang.lexer import tokenize
 from jaclang.parser import parse
 from jaclang.preprocessor import preprocess
-from jaclang.virtual_machine import VirtualMachine
 
 
 def compileJaclang(file_contents: str, options: list[str]) -> list[int]:
@@ -37,12 +36,6 @@ Options:
         binary_code = compileJaclang(file_contents, options)
 
         print(f"Binary code size: {len(binary_code)} bytes")
-
-        virtual_machine = VirtualMachine(2**16)
-        virtual_machine.run(binary_code)
-
-        print(f"Program returned {virtual_machine.getReturnCode()}")
-        print(f"Cycles made: {virtual_machine.getCycleCount()}")
     except JaclangSyntaxError as error:
         error.printError(file_contents)
         exit(1)
