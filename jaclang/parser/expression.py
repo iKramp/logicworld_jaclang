@@ -3,10 +3,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from jaclang.generator import Instruction, PushInstruction, EXPR_REG, PopInstruction, AddInstruction, RET_REG, \
-    SubInstruction, MovInstruction, CmpInstruction, CMP_EQUAL, CMP_LESSER, CMP_GREATER, CMP_LESSER_OR_EQUAL, \
-    CMP_GREATER_OR_EQUAL, CMP_NOT_EQUAL, BsrInstruction, BslInstruction, OrInstruction, XorInstruction, AndInstruction, \
-    XnorInstruction, NandInstruction
+from jaclang.generator import Instruction, Instructions, CompareFlags, Registers
 from jaclang.lexer import Token, Symbols
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, SymbolData
 from jaclang.parser.id_manager import IdManager
@@ -27,77 +24,77 @@ class Operator:
 
 class PlusOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [AddInstruction(EXPR_REG, RET_REG, RET_REG)]
+        return [Instructions.Add(Registers.EXPRESSION, Registers.RETURN, Registers.RETURN)]
 
 
 class MinusOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [SubInstruction(RET_REG, EXPR_REG, RET_REG)]
+        return [Instructions.Subtract(Registers.RETURN, Registers.EXPRESSION, Registers.RETURN)]
 
 
 class EqualsOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [CmpInstruction(EXPR_REG, RET_REG, CMP_EQUAL)]
+        return [Instructions.Compare(Registers.EXPRESSION, Registers.RETURN, CompareFlags.EQUAL)]
 
 
 class LesserOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [CmpInstruction(EXPR_REG, RET_REG, CMP_LESSER)]
+        return [Instructions.Compare(Registers.EXPRESSION, Registers.RETURN, CompareFlags.LESSER)]
 
 
 class GreaterOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [CmpInstruction(EXPR_REG, RET_REG, CMP_GREATER)]
+        return [Instructions.Compare(Registers.EXPRESSION, Registers.RETURN, CompareFlags.GREATER)]
 
 
 class LesserOrEqualOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [CmpInstruction(EXPR_REG, RET_REG, CMP_LESSER_OR_EQUAL)]
+        return [Instructions.Compare(Registers.EXPRESSION, Registers.RETURN, CompareFlags.LESSER_OR_EQUAL)]
 
 
 class GreaterOrEqualOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [CmpInstruction(EXPR_REG, RET_REG, CMP_GREATER_OR_EQUAL)]
+        return [Instructions.Compare(Registers.EXPRESSION, Registers.RETURN, CompareFlags.GREATER_OR_EQUAL)]
 
 
 class NotEqualOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [CmpInstruction(EXPR_REG, RET_REG, CMP_NOT_EQUAL)]
+        return [Instructions.Compare(Registers.EXPRESSION, Registers.RETURN, CompareFlags.NOT_EQUAL)]
 
 
 class BitShiftLeftOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [BslInstruction(EXPR_REG, RET_REG, RET_REG)]
+        return [Instructions.BitShiftLeft(Registers.EXPRESSION, Registers.RETURN, Registers.RETURN)]
 
 
 class BitShiftRightOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [BsrInstruction(EXPR_REG, RET_REG, RET_REG)]
+        return [Instructions.BitShiftRight(Registers.EXPRESSION, Registers.RETURN, Registers.RETURN)]
 
 
 class OrOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [OrInstruction(EXPR_REG, RET_REG, RET_REG)]
+        return [Instructions.Or(Registers.EXPRESSION, Registers.RETURN, Registers.RETURN)]
 
 
 class XorOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [XorInstruction(EXPR_REG, RET_REG, RET_REG)]
+        return [Instructions.Xor(Registers.EXPRESSION, Registers.RETURN, Registers.RETURN)]
 
 
 class AndOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [AndInstruction(EXPR_REG, RET_REG, RET_REG)]
+        return [Instructions.And(Registers.EXPRESSION, Registers.RETURN, Registers.RETURN)]
 
 
 class XnorOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [XnorInstruction(EXPR_REG, RET_REG, RET_REG)]
+        return [Instructions.Xnor(Registers.EXPRESSION, Registers.RETURN, Registers.RETURN)]
 
 
 class NandOperator(Operator):
     def generateInstructions(self) -> list[Instruction]:
-        return [NandInstruction(EXPR_REG, RET_REG, RET_REG)]
+        return [Instructions.Nand(Registers.EXPRESSION, Registers.RETURN, Registers.RETURN)]
 
 
 Operator.operators[Symbols.PLUS] = PlusOperator(Symbols.PLUS.name)
@@ -149,12 +146,12 @@ class ExpressionBranch(ValueBranch):
 
         instructions += self.value1.generateInstructions(symbols, id_manager, stack_manager)
         instructions += [
-            MovInstruction(RET_REG, EXPR_REG),
-            PushInstruction(EXPR_REG),
+            Instructions.Mov(Registers.RETURN, Registers.EXPRESSION),
+            Instructions.Push(Registers.EXPRESSION),
         ]
         instructions += self.value2.generateInstructions(symbols, id_manager, stack_manager)
         instructions += [
-            PopInstruction(EXPR_REG),
+            Instructions.Pop(Registers.EXPRESSION),
         ]
 
         instructions += self.expr_operator.generateInstructions()

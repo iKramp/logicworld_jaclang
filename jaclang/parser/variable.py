@@ -1,7 +1,7 @@
 from typing import Optional
 
 from jaclang.error.syntax_error import JaclangSyntaxError
-from jaclang.generator import Instruction, MemwInstruction, RET_REG, SB_REG, MemrInstruction
+from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory, ValueFactory, ValueBranch
@@ -31,7 +31,7 @@ class VariableAssignmentBranch(Branch):
         if self.value is not None:
             instructions += self.value.generateInstructions(symbols, id_manager, stack_manager)
             instructions += [
-                MemwInstruction(SB_REG, variable_obj.pos_on_stack, RET_REG),
+                Instructions.MemoryWrite(Registers.STACK_BASE, variable_obj.pos_on_stack, Registers.RETURN),
             ]
         return instructions
 
@@ -113,7 +113,7 @@ class VariableBranch(ValueBranch):
             raise JaclangSyntaxError(-1, f"Label '{self.variable_name}' is not a variable")
 
         return [
-            MemrInstruction(SB_REG, variable_obj.pos_on_stack, RET_REG),
+            Instructions.MemRead(Registers.STACK_BASE, variable_obj.pos_on_stack, Registers.RETURN),
         ]
 
 

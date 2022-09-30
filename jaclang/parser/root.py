@@ -1,7 +1,6 @@
 from typing import Optional
 
-from jaclang.generator import Instruction, NopInstruction, JmpInstruction, PushInstruction, \
-    ImmediateLabelInstruction, ADDR_REG, GetSpInstruction, SB_REG, LabelInstruction
+from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, EndToken
 from jaclang.parser.branch import Branch, BranchFactory, SymbolData
 from jaclang.parser.id_manager import IdManager
@@ -22,13 +21,13 @@ class RootBranch(Branch):
             instructions += branch.generateInstructions(symbols, id_manager)
 
         start_instructions: list[Instruction] = [
-            GetSpInstruction(SB_REG),
-            ImmediateLabelInstruction(ADDR_REG, "end_program"),
-            PushInstruction(ADDR_REG),
-            ImmediateLabelInstruction(ADDR_REG, "fmain"),
-            JmpInstruction(ADDR_REG),
-            LabelInstruction("end_program"),
-            NopInstruction(),
+            Instructions.GetStackPointer(Registers.STACK_BASE),
+            Instructions.ImmediateLabel(Registers.ADDRESS, "end_program"),
+            Instructions.Push(Registers.ADDRESS),
+            Instructions.ImmediateLabel(Registers.ADDRESS, "fmain"),
+            Instructions.Jump(Registers.ADDRESS),
+            Instructions.Label("end_program"),
+            Instructions.Terminate(),
         ]
 
         return start_instructions + instructions

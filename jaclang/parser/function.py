@@ -2,9 +2,7 @@ from copy import copy
 from typing import Optional
 
 from jaclang.error.syntax_error import JaclangSyntaxError
-from jaclang.generator import Instruction, LabelInstruction, PushInstruction, SB_REG, PopInstruction, \
-    GetSpInstruction, ADDR_REG, JmpInstruction, ImmediateLabelInstruction, MovInstruction, \
-    ImmediateInstruction, RET_REG, AddInstruction, SetSpInstruction
+from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
 from jaclang.parser import RootFactory
 from jaclang.parser.branch import Branch, BranchFactory, TokenExpectedException, TokenNeededException, SymbolData
@@ -28,11 +26,11 @@ class ReturnStatementBranch(Branch):
         if self.value is not None:
             instructions += self.value.generateInstructions(symbols, id_manager, stack_manager)
         instructions += [
-            PopInstruction(ADDR_REG),
-            SetSpInstruction(SB_REG),
-            MovInstruction(ADDR_REG, SB_REG),
-            PopInstruction(ADDR_REG),
-            JmpInstruction(ADDR_REG),
+            Instructions.Pop(Registers.ADDRESS),
+            Instructions.SetStackPointer(Registers.STACK_BASE),
+            Instructions.Mov(Registers.ADDRESS, Registers.STACK_BASE),
+            Instructions.Pop(Registers.ADDRESS),
+            Instructions.Jump(Registers.ADDRESS),
         ]
         return instructions
 
@@ -73,13 +71,13 @@ class FunctionDeclarationBranch(Branch):
         body_instructions = self.body.generateInstructions(func_symbols, id_manager, stack_manager)
 
         begin_instructions: list[Instruction] = [
-            LabelInstruction("f" + self.name),
-            MovInstruction(SB_REG, ADDR_REG),
-            GetSpInstruction(SB_REG),
-            ImmediateInstruction(RET_REG, stack_manager.getSize()),
-            AddInstruction(SB_REG, RET_REG, RET_REG),
-            SetSpInstruction(RET_REG),
-            PushInstruction(ADDR_REG),
+            Instructions.Label("f" + self.name),
+            Instructions.Mov(Registers.STACK_BASE, Registers.ADDRESS),
+            Instructions.GetStackPointer(Registers.STACK_BASE),
+            Instructions.Immediate(Registers.RETURN, stack_manager.getSize()),
+            Instructions.Add(Registers.STACK_BASE, Registers.RETURN, Registers.RETURN),
+            Instructions.SetStackPointer(Registers.RETURN),
+            Instructions.Push(Registers.ADDRESS),
         ]
 
         return begin_instructions + body_instructions
@@ -127,11 +125,11 @@ class FunctionCallBranch(ValueBranch):
 
         jmp_label = f"jmp{id_manager.requestId()}"
         start_instructions: list[Instruction] = [
-            ImmediateLabelInstruction(ADDR_REG, jmp_label),
-            PushInstruction(ADDR_REG),
-            ImmediateLabelInstruction(ADDR_REG, "f" + self.function_name),
-            JmpInstruction(ADDR_REG),
-            LabelInstruction(jmp_label),
+            Instructions.ImmediateLabel(Registers.ADDRESS, jmp_label),
+            Instructions.Push(Registers.ADDRESS),
+            Instructions.ImmediateLabel(Registers.ADDRESS, "f" + self.function_name),
+            Instructions.Jump(Registers.ADDRESS),
+            Instructions.Label(jmp_label),
         ]
         return start_instructions
 

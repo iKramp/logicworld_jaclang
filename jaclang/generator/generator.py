@@ -23,14 +23,15 @@ class RegisterParameter(Parameter):
         return self.name
 
 
-RET_REG = RegisterParameter(0, "RRET")
-REG1 = RegisterParameter(1, "R1")
-REG2 = RegisterParameter(2, "R2")
-REG3 = RegisterParameter(3, "R3")
-REG4 = RegisterParameter(4, "R4")
-ADDR_REG = RegisterParameter(5, "RADDR")
-EXPR_REG = RegisterParameter(6, "REXPR")
-SB_REG = RegisterParameter(7, "RSB")
+class Registers:
+    RETURN = RegisterParameter(0, "RRET")
+    REG1 = RegisterParameter(1, "R1")
+    REG2 = RegisterParameter(2, "R2")
+    REG3 = RegisterParameter(3, "R3")
+    REG4 = RegisterParameter(4, "R4")
+    ADDRESS = RegisterParameter(5, "RADDR")
+    EXPRESSION = RegisterParameter(6, "REXPR")
+    STACK_BASE = RegisterParameter(7, "RSB")
 
 
 class Value16Parameter(Parameter):
@@ -81,7 +82,7 @@ class Instruction:
                 info += " "
         print(info)
 
-    def toBytes(self, labels: dict[str, int]) -> list[int]:
+    def toBytes(self, _: dict[str, int]) -> list[int]:
         if self.length == 0:
             return []
 
