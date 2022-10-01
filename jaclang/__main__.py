@@ -1,6 +1,7 @@
 import sys
 
 from jaclang import compileJaclang
+from jaclang.binary_writer import binary_writer
 from jaclang.error.syntax_error import JaclangSyntaxError
 
 
@@ -12,7 +13,8 @@ Options:
 - debug_preprocess: print preprocessed code
 - debug_tokens: print tokens
 - debug_tree: print abstract syntax tree
-- debug_assembly: print generated assembly code"""
+- debug_assembly: print generated assembly code
+- write: write binary code to logic world"""
         )
         return
 
@@ -26,11 +28,12 @@ Options:
         binary_code = compileJaclang(file_contents, options)
 
         print(f"Binary code size: {len(binary_code)} bytes")
+
+        if "write" in options:
+            binary_writer.writeBinary(binary_code)
     except JaclangSyntaxError as error:
         error.printError(file_contents)
         exit(1)
-
-    # binary_writer.writeBinary(binary_code)
 
 
 if __name__ == "__main__":

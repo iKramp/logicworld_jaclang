@@ -5,7 +5,8 @@ WORD_KEYS = "IUYTREWQ87654321"
 
 
 def writeBinary(binary_code):
-    time.sleep(3)
+    print("Waiting for key 'p' to be pressed. Then the compiler will start the writing process.")
+    keyboard.wait("p")
 
     keyboard.press("o")
     time.sleep(0.1)

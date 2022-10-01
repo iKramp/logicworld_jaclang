@@ -1,1 +1,1 @@
-from binary_writer import writeBinary
+from jaclang.binary_writer.binary_writer import writeBinary
