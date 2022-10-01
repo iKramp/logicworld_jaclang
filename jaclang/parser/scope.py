@@ -79,7 +79,8 @@ class ScopeBranch(BranchInScope):
             branch.printInfo(nested_level + 1)
 
     def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
-        copied_context = ScopeContext(copy(context.symbols), context.id_manager, context.stack_manager)
+        copied_context = context
+        copied_context.symbols = copy(context.symbols)
         instructions = []
         for branch in self.branches:
             instructions += branch.generateInstructions(copied_context)

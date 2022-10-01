@@ -1,6 +1,7 @@
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, Keywords
-from jaclang.parser.expression import ExpressionBranch, ExpressionFactory
+from jaclang.parser.expression import ExpressionFactory
+from jaclang.parser.expression.expression import ExpressionBranch
 from jaclang.parser.scope import ScopeFactory, BranchInScope, BranchInScopeFactory, ModifierBranchInScope, \
     TokenExpectedException, ScopeContext
 

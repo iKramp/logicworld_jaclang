@@ -1,7 +1,7 @@
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols
-from jaclang.parser.expression import ValueBranch
+from jaclang.parser.expression.value import ValueBranch
 from jaclang.parser.function.declaration import FunctionData
 from jaclang.parser.scope import BranchInScope, BranchInScopeFactory, TokenExpectedException, TokenNeededException, \
     ScopeContext
