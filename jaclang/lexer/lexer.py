@@ -135,7 +135,6 @@ class Symbols:
     RIGHT_BRACE = SymbolToken("RIGHT_BRACE", "}")
     SQUARE_LEFT_BRACKET = SymbolToken("SQUARE_LEFT_BRACKET", "[")
     SQUARE_RIGHT_BRACKET = SymbolToken("SQUARE_RIGHT_BRACKET", "]")
-    COLON = SymbolToken("COLON", ":")
 
 
 class Keywords:
