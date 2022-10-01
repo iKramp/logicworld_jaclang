@@ -1,11 +1,22 @@
 from abc import abstractmethod, ABC
+from copy import copy
 
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction
 from jaclang.lexer import Token, Symbols, EndToken
-from jaclang.parser.id_manager import IdManager
-from jaclang.parser.root import SymbolData, RootContext
-from jaclang.parser.stack_manager import StackManager
+from jaclang.parser.root import SymbolData, RootContext, IdManager
+
+
+class StackManager:
+    def __init__(self):
+        self.top = 0
+
+    def allocate(self):
+        self.top += 1
+        return self.top - 1
+
+    def getSize(self):
+        return self.top
 
 
 class ScopeContext(RootContext):
@@ -68,9 +79,10 @@ class ScopeBranch(BranchInScope):
             branch.printInfo(nested_level + 1)
 
     def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
+        copied_context = ScopeContext(copy(context.symbols), context.id_manager, context.stack_manager)
         instructions = []
         for branch in self.branches:
-            instructions += branch.generateInstructions(context)
+            instructions += branch.generateInstructions(copied_context)
         return instructions
 
 

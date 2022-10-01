@@ -3,8 +3,8 @@ from copy import copy
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, Keywords, IdentifierToken, Symbols
 from jaclang.parser.root import SymbolData, BranchInRoot, BranchInRootFactory, RootContext
-from jaclang.parser.scope import TokenExpectedException, ScopeBranch, TokenNeededException, ScopeFactory, ScopeContext
-from jaclang.parser.stack_manager import StackManager
+from jaclang.parser.scope import TokenExpectedException, ScopeBranch, TokenNeededException, ScopeFactory, ScopeContext, \
+    StackManager
 from jaclang.parser.function.return_statement import ReturnStatementBranch
 
 
