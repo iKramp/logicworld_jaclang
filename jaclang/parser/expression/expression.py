@@ -43,7 +43,7 @@ class ExpressionFactory(BranchInScopeFactory):
 
         return self.parseRecursive(pos, tokens, value)
 
-    def parseRecursive(self, pos: int, tokens: list[Token], expr_branch: ValueBranch) -> (int, ExpressionBranch):
+    def parseRecursive(self, pos: int, tokens: list[Token], expr_branch: ValueBranch) -> (int, ValueBranch):
         if tokens[pos] not in Operator.operators.keys():
             return pos, expr_branch
 

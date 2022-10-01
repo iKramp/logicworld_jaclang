@@ -101,6 +101,8 @@ class VirtualMachine:
                 reg_value = self.memory[self.program_counter + 2]
                 offset = self.memory[self.program_counter + 3]
                 address = self.registers[reg_addr] + offset
+                if (offset >> 7) & 1 == 1:
+                    address -= 1 << 8
                 value = self.registers[reg_value]
                 self.memory[address] = value & 0xFF
                 self.memory[address + 1] = (value >> 8) & 0xFF
@@ -110,6 +112,8 @@ class VirtualMachine:
                 offset = self.memory[self.program_counter + 2]
                 reg_save = self.memory[self.program_counter + 3]
                 address = self.registers[reg_addr] + offset
+                if (offset >> 7) & 1 == 1:
+                    address -= 1 << 8
                 value = self.memory[address] + (self.memory[address + 1] << 8)
                 self.registers[reg_save] = value
                 self.program_counter += 4

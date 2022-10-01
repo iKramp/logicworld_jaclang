@@ -3,12 +3,12 @@ from typing import Optional
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, Keywords
 from jaclang.parser.expression import ExpressionFactory
-from jaclang.parser.expression.expression import ExpressionBranch
+from jaclang.parser.expression.value import ValueBranch
 from jaclang.parser.scope import BranchInScope, BranchInScopeFactory, TokenExpectedException, ScopeContext
 
 
 class ReturnStatementBranch(BranchInScope):
-    def __init__(self, value: Optional[ExpressionBranch]):
+    def __init__(self, value: Optional[ValueBranch]):
         self.value = value
 
     def generateInstructions(self, context: ScopeContext) -> list[Instruction]:

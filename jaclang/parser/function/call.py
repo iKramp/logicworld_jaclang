@@ -1,19 +1,23 @@
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols
+from jaclang.parser.expression import ExpressionFactory
 from jaclang.parser.expression.value import ValueBranch
 from jaclang.parser.function.declaration import FunctionData
 from jaclang.parser.root import InitGenerator, RootContext
-from jaclang.parser.scope import BranchInScope, BranchInScopeFactory, TokenExpectedException, TokenNeededException, \
-    ScopeContext, StackManager
+from jaclang.parser.scope import BranchInScope, BranchInScopeFactory, TokenExpectedException, ScopeContext, StackManager
 
 
 class FunctionCallBranch(ValueBranch):
-    def __init__(self, function_name: str):
+    def __init__(self, function_name: str, args: list[ValueBranch]):
         self.function_name = function_name
+        self.args = args
 
     def printInfo(self, nested_level: int):
-        print('    ' * nested_level, f"call: {self.function_name}()")
+        print('    ' * nested_level, f"call: {self.function_name}")
+        for arg in self.args:
+            print('    ' * nested_level, "arg:")
+            arg.printInfo(nested_level + 1)
 
     def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
         if self.function_name not in context.symbols.keys():
@@ -23,14 +27,25 @@ class FunctionCallBranch(ValueBranch):
             raise JaclangSyntaxError(-1, f"Symbol '{self.function_name}' is not a function")
 
         jmp_label = f"jump {context.id_manager.requestId()}"
-        start_instructions: list[Instruction] = [
+        instructions = []
+        for arg in self.args:
+            instructions += arg.generateInstructions(context)
+            instructions += [
+                Instructions.Push(Registers.RETURN),
+            ]
+
+        instructions += [
             Instructions.ImmediateLabel(Registers.ADDRESS, jmp_label),
             Instructions.Push(Registers.ADDRESS),
             Instructions.ImmediateLabel(Registers.ADDRESS, "func " + self.function_name),
             Instructions.Jump(Registers.ADDRESS),
             Instructions.Label(jmp_label),
         ]
-        return start_instructions
+
+        instructions += [
+            Instructions.Pop(Registers.ADDRESS),
+        ] * len(self.args)
+        return instructions
 
 
 class FunctionCallFactory(BranchInScopeFactory):
@@ -42,14 +57,18 @@ class FunctionCallFactory(BranchInScopeFactory):
         if tokens[pos] != Symbols.LEFT_BRACKET:
             raise TokenExpectedException(tokens[pos].pos, "Expected '('")
 
+        expr_factory = ExpressionFactory()
+        args = []
         pos += 1
-        if tokens[pos] != Symbols.RIGHT_BRACKET:
-            raise TokenNeededException(tokens[pos].pos, "Expected ')'")
+        while tokens[pos] != Symbols.RIGHT_BRACKET:
+            pos, branch = expr_factory.parseExpect(pos, tokens)
+            args.append(branch)
 
         pos += 1
-        return pos, FunctionCallBranch(function_name)
+        return pos, FunctionCallBranch(function_name, args)
 
 
 class MainCallGenerator(InitGenerator):
     def generateInitInstructions(self, context: RootContext) -> list[Instruction]:
-        return FunctionCallBranch("main").generateInstructions(ScopeContext(context.symbols, context.id_manager, StackManager()))
+        return FunctionCallBranch("main", []).generateInstructions(
+            ScopeContext(context.symbols, context.id_manager, StackManager()))

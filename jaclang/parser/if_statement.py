@@ -1,13 +1,13 @@
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, Keywords
 from jaclang.parser.expression import ExpressionFactory
-from jaclang.parser.expression.expression import ExpressionBranch
+from jaclang.parser.expression.value import ValueBranch
 from jaclang.parser.scope import ScopeFactory, BranchInScope, BranchInScopeFactory, ModifierBranchInScope, \
     TokenExpectedException, ScopeContext
 
 
 class IfStatementBranch(ModifierBranchInScope):
-    def __init__(self, condition: ExpressionBranch):
+    def __init__(self, condition: ValueBranch):
         super().__init__()
         self.condition = condition
 

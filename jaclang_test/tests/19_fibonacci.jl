@@ -5,7 +5,7 @@
 var param
 
 func fib() {
-    if (param == 0) | (param == 1)
+    if param < 2
         return param
     var par = param
     param = par - 1

@@ -3,7 +3,8 @@ from typing import Optional
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Registers, Instructions
 from jaclang.lexer import IdentifierToken, Token, Symbols
-from jaclang.parser.expression.expression import ExpressionBranch, ExpressionFactory
+from jaclang.parser.expression.expression import ExpressionFactory
+from jaclang.parser.expression.value import ValueBranch
 from jaclang.parser.root import SymbolData
 from jaclang.parser.scope import BranchInScope, ScopeContext, BranchInScopeFactory, TokenExpectedException
 
@@ -19,7 +20,7 @@ class GlobalVariableData(SymbolData):
 
 
 class VariableAssignmentBranch(BranchInScope):
-    def __init__(self, variable_name: str, value: Optional[ExpressionBranch]):
+    def __init__(self, variable_name: str, value: Optional[ValueBranch]):
         self.variable_name = variable_name
         self.value = value
 
