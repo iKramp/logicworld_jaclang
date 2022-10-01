@@ -222,3 +222,14 @@ class Instructions:
 
         def preCompile(self, curr_addr: int, labels: dict[str, int]):
             labels[self.label_name] = curr_addr
+
+    class Value(Instruction):
+        def __init__(self, value: int):
+            super().__init__("", 0b00000, [], 2)
+            self.value = value
+
+        def printInfo(self):
+            print(f"    {self.value}")
+
+        def toBytes(self, _: dict[str, int]) -> list[int]:
+            return [self.value & 0xFF, (self.value >> 8) & 0xFF]

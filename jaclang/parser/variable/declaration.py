@@ -1,12 +1,14 @@
 from typing import Optional
 
-from jaclang.generator import Instruction
+from jaclang.error.syntax_error import JaclangSyntaxError
+from jaclang.generator import Instruction, Instructions
 from jaclang.lexer import Token, Keywords, IdentifierToken, Symbols
 from jaclang.parser.expression import ExpressionFactory
 from jaclang.parser.expression.value import ValueBranch
+from jaclang.parser.root import BranchInRootFactory, BranchInRoot, RootContext
 from jaclang.parser.scope import BranchInScopeFactory, BranchInScope, TokenExpectedException, TokenNeededException, \
     ScopeContext
-from jaclang.parser.variable.assignment import VariableAssignmentBranch, VariableData
+from jaclang.parser.variable.assignment import VariableAssignmentBranch, GlobalVariableData, VariableData
 
 
 class VariableDeclarationBranch(BranchInScope):
@@ -48,3 +50,35 @@ class VariableDeclarationFactory(BranchInScopeFactory):
             return pos, VariableDeclarationBranch(variable_name, value)
         else:
             return pos, VariableDeclarationBranch(variable_name, None)
+
+
+class GlobalVariableDeclarationBranch(BranchInRoot):
+    def __init__(self, variable_name: str):
+        self.variable_name = variable_name
+
+    def generateInstructions(self, context: RootContext) -> list[Instruction]:
+        context.symbols[self.variable_name] = GlobalVariableData()
+
+        return [
+            Instructions.Label(f"var {self.variable_name}"),
+            Instructions.Value(0),
+        ]
+
+    def printInfo(self, nested_level: int):
+        print('    ' * nested_level, "GlobalVariableDeclaration:")
+        print('    ' * nested_level, f"    name: {self.variable_name}")
+
+
+class GlobalVariableDeclarationFactory(BranchInRootFactory):
+    def parse(self, pos: int, tokens: list[Token]) -> (int, BranchInRoot):
+        if tokens[pos] != Keywords.VAR:
+            return pos, None
+
+        pos += 1
+        if type(tokens[pos]) is not IdentifierToken:
+            raise JaclangSyntaxError(tokens[pos].pos, "Expected variable name after var keyword")
+        variable_name = tokens[pos].identifier
+
+        pos += 1
+
+        return pos, GlobalVariableDeclarationBranch(variable_name)

@@ -1,5 +1,6 @@
 from copy import copy
 
+from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, Keywords, IdentifierToken, Symbols
 from jaclang.parser.root import SymbolData, BranchInRoot, BranchInRootFactory, RootContext
@@ -44,20 +45,20 @@ class FunctionDeclarationBranch(BranchInRoot):
 class FunctionDeclarationFactory(BranchInRootFactory):
     def parse(self, pos: int, tokens: list[Token]) -> (int, BranchInRoot):
         if tokens[pos] != Keywords.FUNC:
-            raise TokenExpectedException(tokens[pos].pos, "Expected func keyword in function declaration")
+            return pos, None
 
         pos += 1
         if type(tokens[pos]) is not IdentifierToken:
-            raise TokenNeededException(tokens[pos].pos, "Expected identifier after func keyword")
+            raise JaclangSyntaxError(tokens[pos].pos, "Expected identifier after func keyword")
         func_name = tokens[pos].identifier
 
         pos += 1
         if tokens[pos] != Symbols.LEFT_BRACKET:
-            raise TokenNeededException(tokens[pos].pos, "Expected '(' after func name")
+            raise JaclangSyntaxError(tokens[pos].pos, "Expected '(' after func name")
 
         pos += 1
         if tokens[pos] != Symbols.RIGHT_BRACKET:
-            raise TokenNeededException(tokens[pos].pos, "Expected ')' after '('")
+            raise JaclangSyntaxError(tokens[pos].pos, "Expected ')' after '('")
 
         pos += 1
 

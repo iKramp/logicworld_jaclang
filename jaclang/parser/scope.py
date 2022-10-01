@@ -12,8 +12,8 @@ class StackManager:
         self.top = 0
 
     def allocate(self):
-        self.top += 1
-        return self.top - 1
+        self.top += 2
+        return self.top - 2
 
     def getSize(self):
         return self.top

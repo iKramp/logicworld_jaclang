@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Instructions
 from jaclang.lexer import Token, EndToken
 
@@ -82,6 +83,10 @@ class RootFactory:
         while tokens[pos] != EndToken():
             for factory in RootFactory.factories:
                 pos, branch = factory.parse(pos, tokens)
-                branches.append(branch)
+                if branch is not None:
+                    branches.append(branch)
+                    break
+            else:
+                raise JaclangSyntaxError(tokens[pos].pos, "Unrecognized statement")
 
         return pos, RootBranch(branches)

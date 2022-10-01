@@ -13,6 +13,11 @@ class VariableData(SymbolData):
         self.pos_on_stack = pos_on_stack
 
 
+class GlobalVariableData(SymbolData):
+    def __init__(self):
+        pass
+
+
 class VariableAssignmentBranch(BranchInScope):
     def __init__(self, variable_name: str, value: Optional[ExpressionBranch]):
         self.variable_name = variable_name
@@ -22,15 +27,23 @@ class VariableAssignmentBranch(BranchInScope):
         if self.variable_name not in context.symbols.keys():
             raise JaclangSyntaxError(-1, f"Variable '{self.variable_name}' not found")
         variable_obj = context.symbols[self.variable_name]
-        if type(variable_obj) is not VariableData:
-            raise JaclangSyntaxError(-1, f"Label '{self.variable_name}' is not a variable")
-
         instructions = []
         if self.value is not None:
             instructions += self.value.generateInstructions(context)
-            instructions += [
-                Instructions.MemoryWrite(Registers.STACK_BASE, variable_obj.pos_on_stack, Registers.RETURN),
-            ]
+        if type(variable_obj) is VariableData:
+            if self.value is not None:
+                instructions += [
+                    Instructions.MemoryWrite(Registers.STACK_BASE, variable_obj.pos_on_stack, Registers.RETURN),
+                ]
+        elif type(variable_obj) is GlobalVariableData:
+            if self.value is not None:
+                instructions += [
+                    Instructions.ImmediateLabel(Registers.ADDRESS, f"var {self.variable_name}"),
+                    Instructions.MemoryWrite(Registers.ADDRESS, 0, Registers.RETURN),
+                ]
+        else:
+            raise JaclangSyntaxError(-1, f"Label '{self.variable_name}' is not a variable")
+
         return instructions
 
     def printInfo(self, nested_level: int):
