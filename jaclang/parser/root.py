@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from jaclang.generator import Instruction, Instructions, Registers
+from jaclang.generator import Instruction, Instructions
 from jaclang.lexer import Token, EndToken
 
 
@@ -40,7 +40,14 @@ class BranchInRootFactory:
         pass
 
 
+class InitGenerator:
+    def generateInitInstructions(self, context: RootContext) -> list[Instruction]:
+        return []
+
+
 class RootBranch:
+    init_generators: list[InitGenerator] = []
+
     def __init__(self, branches: list[BranchInRoot]):
         self.branches = branches
 
@@ -55,14 +62,12 @@ class RootBranch:
         for branch in self.branches:
             instructions += branch.generateInstructions(context)
 
-        start_instructions: list[Instruction] = [
-            Instructions.GetStackPointer(Registers.STACK_BASE),
-            Instructions.ImmediateLabel(Registers.ADDRESS, "end_program"),
-            Instructions.Push(Registers.ADDRESS),
-            Instructions.ImmediateLabel(Registers.ADDRESS, "fmain"),
-            Instructions.Jump(Registers.ADDRESS),
-            Instructions.Label("end_program"),
-            Instructions.Terminate(),
+        start_instructions = []
+        for generator in self.init_generators:
+            start_instructions += generator.generateInitInstructions(context)
+
+        start_instructions += [
+            Instructions.Terminate()
         ]
 
         return start_instructions + instructions

@@ -3,8 +3,9 @@ from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols
 from jaclang.parser.expression.value import ValueBranch
 from jaclang.parser.function.declaration import FunctionData
+from jaclang.parser.root import InitGenerator, RootContext
 from jaclang.parser.scope import BranchInScope, BranchInScopeFactory, TokenExpectedException, TokenNeededException, \
-    ScopeContext
+    ScopeContext, StackManager
 
 
 class FunctionCallBranch(ValueBranch):
@@ -21,11 +22,11 @@ class FunctionCallBranch(ValueBranch):
         if type(context.symbols[self.function_name]) is not FunctionData:
             raise JaclangSyntaxError(-1, f"Symbol '{self.function_name}' is not a function")
 
-        jmp_label = f"jmp{context.id_manager.requestId()}"
+        jmp_label = f"jump {context.id_manager.requestId()}"
         start_instructions: list[Instruction] = [
             Instructions.ImmediateLabel(Registers.ADDRESS, jmp_label),
             Instructions.Push(Registers.ADDRESS),
-            Instructions.ImmediateLabel(Registers.ADDRESS, "f" + self.function_name),
+            Instructions.ImmediateLabel(Registers.ADDRESS, "func " + self.function_name),
             Instructions.Jump(Registers.ADDRESS),
             Instructions.Label(jmp_label),
         ]
@@ -47,3 +48,8 @@ class FunctionCallFactory(BranchInScopeFactory):
 
         pos += 1
         return pos, FunctionCallBranch(function_name)
+
+
+class MainCallGenerator(InitGenerator):
+    def generateInitInstructions(self, context: RootContext) -> list[Instruction]:
+        return FunctionCallBranch("main").generateInstructions(ScopeContext(context.symbols, context.id_manager, StackManager()))

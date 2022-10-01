@@ -13,8 +13,8 @@ class IfStatementBranch(ModifierBranchInScope):
 
     def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
         instructions = self.condition.generateInstructions(context)
-        if_begin = f"if_begin:{context.id_manager.requestId()}"
-        if_end = f"if_end:{context.id_manager.requestId()}"
+        if_begin = f"if begin {context.id_manager.requestId()}"
+        if_end = f"if end {context.id_manager.requestId()}"
         instructions += [
             Instructions.ImmediateLabel(Registers.ADDRESS, if_begin),
             Instructions.JumpIf(Registers.ADDRESS),

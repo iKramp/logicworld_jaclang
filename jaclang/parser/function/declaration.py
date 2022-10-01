@@ -29,7 +29,7 @@ class FunctionDeclarationBranch(BranchInRoot):
         body_instructions = self.body.generateInstructions(new_context)
 
         begin_instructions: list[Instruction] = [
-            Instructions.Label("f" + self.name),
+            Instructions.Label(f"func {self.name}"),
             Instructions.Mov(Registers.STACK_BASE, Registers.ADDRESS),
             Instructions.GetStackPointer(Registers.STACK_BASE),
             Instructions.Immediate(Registers.RETURN, new_context.stack_manager.getSize()),
