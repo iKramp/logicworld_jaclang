@@ -5,11 +5,20 @@ from jaclang.parser.id_manager import IdManager
 from jaclang.parser.root import RootFactory
 
 # modules
+from jaclang.parser import if_statement
 from jaclang.parser import integer
 from jaclang.parser import function
 from jaclang.parser import scope
 from jaclang.parser import variable
 from jaclang.parser import expression
+
+
+if_statement.load()
+integer.load()
+function.load()
+scope.load()
+variable.load()
+expression.load()
 
 
 def parse(tokens: list[Token], debug_output: bool = False) -> list[Instruction]:

@@ -1,7 +1,8 @@
-/// expect 22
-
-// operators test
 
 func main() {
-    return (2 << 3) + (3 + 2)
+    if 10 == 10
+        var b = 10
+    var a = 20
+    a = 30
+    return a
 }

@@ -198,5 +198,6 @@ class ParenthesesFactory(BranchInScopeFactory):
         return pos, expr
 
 
-ScopeFactory.factories.append(ExpressionFactory())
-ValueFactory.factories.append(ParenthesesFactory())
+def load():
+    ScopeFactory.factories.append(ExpressionFactory())
+    ValueFactory.factories.append(ParenthesesFactory())

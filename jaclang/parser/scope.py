@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from typing import Optional
 
 from jaclang.error.syntax_error import JaclangSyntaxError
@@ -11,12 +11,19 @@ from jaclang.parser.stack_manager import StackManager
 
 class BranchInScope:
     @abstractmethod
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: StackManager) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager,
+                             stack_manager: StackManager) -> list[Instruction]:
         pass
 
     @abstractmethod
     def printInfo(self, nested_level: int):
         pass
+
+
+# modifier branch is a branch that affects execution of the next branch such as if statement
+class ModifierBranchInScope(BranchInScope, ABC):
+    def __init__(self):
+        self.branch: BranchInScope
 
 
 class BranchInScopeFactory:
@@ -56,7 +63,8 @@ class ScopeBranch(BranchInScope):
         for branch in self.branches:
             branch.printInfo(nested_level + 1)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager,
+                             stack_manager: Optional[StackManager] = None) -> list[Instruction]:
         instructions = []
         for branch in self.branches:
             instructions += branch.generateInstructions(symbols, id_manager, stack_manager)
@@ -66,6 +74,22 @@ class ScopeBranch(BranchInScope):
 class ScopeFactory(BranchInScopeFactory):
     factories = []
 
+    @staticmethod
+    def parseStatement(pos: int, tokens: list[Token]) -> (int, BranchInScope):
+        for factory in ScopeFactory.factories:
+            pos, branch = factory.parseDontExpect(pos, tokens)
+            if branch is not None:
+                if issubclass(type(branch), ModifierBranchInScope):
+                    pos, subbranch = ScopeFactory.parseStatement(pos, tokens)
+                    branch.branch = subbranch
+
+                return pos, branch
+
+        if tokens[pos] == EndToken():
+            raise TokenNeededException(tokens[pos].pos, "Expected '}' at the end of scope")
+        else:
+            raise TokenNeededException(tokens[pos].pos, "Did not recognize statement")
+
     def parseImpl(self, pos: int, tokens: list[Token]) -> (int, BranchInScope):
         if pos >= len(tokens) or tokens[pos] != Symbols.LEFT_BRACE:
             raise TokenExpectedException(tokens[pos].pos, "Expected '{' at beginning of scope")
@@ -73,19 +97,12 @@ class ScopeFactory(BranchInScopeFactory):
 
         branches = []
         while tokens[pos] != Symbols.RIGHT_BRACE:
-            recognized = False
-            for factory in ScopeFactory.factories:
-                pos, branch = factory.parseDontExpect(pos, tokens)
-                if branch is not None:
-                    branches.append(branch)
-                    recognized = True
-            if tokens[pos] == EndToken():
-                raise TokenNeededException(tokens[pos].pos, "Expected '}' at the end of scope")
-            if not recognized:
-                raise TokenNeededException(tokens[pos].pos, "Did not recognize statement")
+            pos, branch = self.parseStatement(pos, tokens)
+            branches.append(branch)
         pos += 1
 
         return pos, ScopeBranch(branches)
 
 
-ScopeFactory.factories.append(ScopeFactory())
+def load():
+    ScopeFactory.factories.append(ScopeFactory())

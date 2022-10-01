@@ -4,7 +4,7 @@ from typing import Optional
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
-from jaclang.parser import RootFactory
+from jaclang.parser.root import RootFactory
 from jaclang.parser.expression import ValueFactory, ValueBranch, ExpressionBranch, ExpressionFactory
 from jaclang.parser.id_manager import IdManager
 from jaclang.parser.root import SymbolData, BranchInRoot, BranchInRootFactory
@@ -152,6 +152,7 @@ class FunctionCallFactory(BranchInScopeFactory):
         return pos, FunctionCallBranch(function_name)
 
 
-ValueFactory.factories.append(FunctionCallFactory())
-RootFactory.factories.append(FunctionDeclarationFactory())
-ScopeFactory.factories.append(ReturnStatementFactory())
+def load():
+    ValueFactory.factories.append(FunctionCallFactory())
+    RootFactory.factories.append(FunctionDeclarationFactory())
+    ScopeFactory.factories.append(ReturnStatementFactory())

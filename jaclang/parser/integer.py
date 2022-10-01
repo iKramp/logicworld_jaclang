@@ -29,4 +29,5 @@ class IntegerFactory(BranchInScopeFactory):
         return pos, IntegerBranch(value)
 
 
-ValueFactory.factories.append(IntegerFactory())
+def load():
+    ValueFactory.factories.append(IntegerFactory())

@@ -127,6 +127,7 @@ class VariableFactory(BranchInScopeFactory):
         return pos, VariableBranch(variable_name)
 
 
-ValueFactory.factories.append(VariableFactory())
-ScopeFactory.factories.append(VariableDeclarationFactory())
-ScopeFactory.factories.append(VariableAssignmentFactory())
+def load():
+    ValueFactory.factories.append(VariableFactory())
+    ScopeFactory.factories.append(VariableDeclarationFactory())
+    ScopeFactory.factories.append(VariableAssignmentFactory())
