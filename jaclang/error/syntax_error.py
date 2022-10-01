@@ -19,7 +19,7 @@ class JaclangSyntaxError(Exception):
             while right < len(file_contents) and file_contents[right] != '\n':
                 right += 1
 
-            while left >= 0 and file_contents[left - 1] != '\n':
+            while left > 0 and file_contents[left - 1] != '\n':
                 left -= 1
 
             line_num = 1
