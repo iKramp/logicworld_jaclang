@@ -4,10 +4,7 @@ from abc import ABC, abstractmethod
 
 from jaclang.generator import Instruction, Instructions, CompareFlags, Registers
 from jaclang.lexer import Token, Symbols
-from jaclang.parser.id_manager import IdManager
-from jaclang.parser.root import SymbolData
-from jaclang.parser.scope import ScopeFactory, BranchInScope, BranchInScopeFactory, TokenExpectedException
-from jaclang.parser.stack_manager import StackManager
+from jaclang.parser.scope import ScopeFactory, BranchInScope, BranchInScopeFactory, TokenExpectedException, ScopeContext
 
 
 class Operator:
@@ -140,15 +137,15 @@ class ExpressionBranch(ValueBranch):
         print('    ' * nested_level, self.expr_operator.name)
         self.value2.printInfo(nested_level)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: StackManager) -> list[Instruction]:
+    def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
         instructions = []
 
-        instructions += self.value1.generateInstructions(symbols, id_manager, stack_manager)
+        instructions += self.value1.generateInstructions(context)
         instructions += [
             Instructions.Mov(Registers.RETURN, Registers.EXPRESSION),
             Instructions.Push(Registers.EXPRESSION),
         ]
-        instructions += self.value2.generateInstructions(symbols, id_manager, stack_manager)
+        instructions += self.value2.generateInstructions(context)
         instructions += [
             Instructions.Pop(Registers.EXPRESSION),
         ]

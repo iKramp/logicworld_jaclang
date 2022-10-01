@@ -4,11 +4,9 @@ from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, IdentifierToken, Symbols, Keywords
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory, ValueFactory, ValueBranch
-from jaclang.parser.id_manager import IdManager
 from jaclang.parser.root import SymbolData
 from jaclang.parser.scope import ScopeFactory, BranchInScope, BranchInScopeFactory, TokenExpectedException, \
-    TokenNeededException
-from jaclang.parser.stack_manager import StackManager
+    TokenNeededException, ScopeContext
 
 
 class VariableData(SymbolData):
@@ -21,16 +19,16 @@ class VariableAssignmentBranch(BranchInScope):
         self.variable_name = variable_name
         self.value = value
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
-        if self.variable_name not in symbols.keys():
+    def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
+        if self.variable_name not in context.symbols.keys():
             raise JaclangSyntaxError(-1, f"Variable '{self.variable_name}' not found")
-        variable_obj = symbols[self.variable_name]
+        variable_obj = context.symbols[self.variable_name]
         if type(variable_obj) is not VariableData:
             raise JaclangSyntaxError(-1, f"Label '{self.variable_name}' is not a variable")
 
         instructions = []
         if self.value is not None:
-            instructions += self.value.generateInstructions(symbols, id_manager, stack_manager)
+            instructions += self.value.generateInstructions(context)
             instructions += [
                 Instructions.MemoryWrite(Registers.STACK_BASE, variable_obj.pos_on_stack, Registers.RETURN),
             ]
@@ -63,13 +61,13 @@ class VariableDeclarationBranch(BranchInScope):
         self.variable_name = variable_name
         self.assignment = VariableAssignmentBranch(variable_name, value)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
-        pos_on_stack = stack_manager.allocate()
-        symbols[self.variable_name] = VariableData(pos_on_stack)
+    def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
+        pos_on_stack = context.stack_manager.allocate()
+        context.symbols[self.variable_name] = VariableData(pos_on_stack)
 
         instructions = []
         if self.assignment is not None:
-            instructions += self.assignment.generateInstructions(symbols, id_manager, stack_manager)
+            instructions += self.assignment.generateInstructions(context)
         return instructions
 
     def printInfo(self, nested_level: int):
@@ -106,10 +104,10 @@ class VariableBranch(ValueBranch):
     def printInfo(self, nested_level: int):
         print('    ' * nested_level, f"var: {self.variable_name}")
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
-        if self.variable_name not in symbols.keys():
+    def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
+        if self.variable_name not in context.symbols.keys():
             raise JaclangSyntaxError(-1, f"Variable '{self.variable_name}' not found")
-        variable_obj = symbols[self.variable_name]
+        variable_obj = context.symbols[self.variable_name]
         if type(variable_obj) is not VariableData:
             raise JaclangSyntaxError(-1, f"Label '{self.variable_name}' is not a variable")
 

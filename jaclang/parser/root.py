@@ -9,9 +9,15 @@ class SymbolData:
     pass
 
 
+class RootContext:
+    def __init__(self, symbols: dict[str, SymbolData], id_manager: IdManager):
+        self.symbols = symbols
+        self.id_manager = id_manager
+
+
 class BranchInRoot:
     @abstractmethod
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager) -> list[Instruction]:
+    def generateInstructions(self, context: RootContext) -> list[Instruction]:
         pass
 
     @abstractmethod
@@ -34,11 +40,11 @@ class RootBranch:
             branch.printInfo(nested_level)
 
     def generateInstructions(self) -> list[Instruction]:
-        symbols = {}
-        id_manager = IdManager()
         instructions = []
+
+        context = RootContext({}, IdManager())
         for branch in self.branches:
-            instructions += branch.generateInstructions(symbols, id_manager)
+            instructions += branch.generateInstructions(context)
 
         start_instructions: list[Instruction] = [
             Instructions.GetStackPointer(Registers.STACK_BASE),

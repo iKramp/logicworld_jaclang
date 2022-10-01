@@ -1,18 +1,22 @@
 from abc import abstractmethod, ABC
-from typing import Optional
 
 from jaclang.error.syntax_error import JaclangSyntaxError
 from jaclang.generator import Instruction
 from jaclang.lexer import Token, Symbols, EndToken
 from jaclang.parser.id_manager import IdManager
-from jaclang.parser.root import SymbolData
+from jaclang.parser.root import SymbolData, RootContext
 from jaclang.parser.stack_manager import StackManager
+
+
+class ScopeContext(RootContext):
+    def __init__(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: StackManager):
+        super().__init__(symbols, id_manager)
+        self.stack_manager = stack_manager
 
 
 class BranchInScope:
     @abstractmethod
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager,
-                             stack_manager: StackManager) -> list[Instruction]:
+    def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
         pass
 
     @abstractmethod
@@ -63,11 +67,10 @@ class ScopeBranch(BranchInScope):
         for branch in self.branches:
             branch.printInfo(nested_level + 1)
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager,
-                             stack_manager: Optional[StackManager] = None) -> list[Instruction]:
+    def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
         instructions = []
         for branch in self.branches:
-            instructions += branch.generateInstructions(symbols, id_manager, stack_manager)
+            instructions += branch.generateInstructions(context)
         return instructions
 
 

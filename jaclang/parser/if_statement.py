@@ -1,13 +1,8 @@
-from typing import Optional
-
 from jaclang.generator import Instruction, Instructions, Registers
 from jaclang.lexer import Token, Keywords
-from jaclang.parser import IdManager
 from jaclang.parser.expression import ExpressionBranch, ExpressionFactory
-from jaclang.parser.root import SymbolData
 from jaclang.parser.scope import ScopeFactory, BranchInScope, BranchInScopeFactory, ModifierBranchInScope, \
-    TokenExpectedException
-from jaclang.parser.stack_manager import StackManager
+    TokenExpectedException, ScopeContext
 
 
 class IfStatementBranch(ModifierBranchInScope):
@@ -15,10 +10,10 @@ class IfStatementBranch(ModifierBranchInScope):
         super().__init__()
         self.condition = condition
 
-    def generateInstructions(self, symbols: dict[str, SymbolData], id_manager: IdManager, stack_manager: Optional[StackManager] = None) -> list[Instruction]:
-        instructions = self.condition.generateInstructions(symbols, id_manager, stack_manager)
-        if_begin = f"if_begin:{id_manager.requestId()}"
-        if_end = f"if_end:{id_manager.requestId()}"
+    def generateInstructions(self, context: ScopeContext) -> list[Instruction]:
+        instructions = self.condition.generateInstructions(context)
+        if_begin = f"if_begin:{context.id_manager.requestId()}"
+        if_end = f"if_end:{context.id_manager.requestId()}"
         instructions += [
             Instructions.ImmediateLabel(Registers.ADDRESS, if_begin),
             Instructions.JumpIf(Registers.ADDRESS),
@@ -26,7 +21,7 @@ class IfStatementBranch(ModifierBranchInScope):
             Instructions.Jump(Registers.ADDRESS),
             Instructions.Label(if_begin),
         ]
-        instructions += self.branch.generateInstructions(symbols, id_manager, stack_manager)
+        instructions += self.branch.generateInstructions(context)
         instructions += [
             Instructions.Label(if_end),
         ]
