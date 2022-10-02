@@ -1,6 +1,6 @@
 /// expect 55
 
-/// fibonacci
+/// fibonacci test
 
 func fib(n) {
     if n < 2

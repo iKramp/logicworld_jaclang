@@ -27,7 +27,7 @@ class FunctionDeclarationBranch(BranchInRoot):
         self.body.printInfo(nested_level + 1)
 
     def generateInstructions(self, context: RootContext) -> list[Instruction]:
-        context.symbols[self.name] = FunctionData(0)
+        context.symbols[self.name] = FunctionData(len(self.arg_names))
 
         new_context = ScopeContext(copy(context.symbols), context.id_manager, StackManager())
 

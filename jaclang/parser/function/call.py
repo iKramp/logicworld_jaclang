@@ -26,6 +26,10 @@ class FunctionCallBranch(ValueBranch):
         if type(context.symbols[self.function_name]) is not FunctionData:
             raise JaclangSyntaxError(-1, f"Symbol '{self.function_name}' is not a function")
 
+        func = context.symbols[self.function_name]
+        if func.args_num != len(self.args):
+            raise JaclangSyntaxError(-1, f"Incorrect number of arguments on a function call (got {len(self.args)}, expected {func.args_num})")
+
         jmp_label = f"jump {context.id_manager.requestId()}"
         instructions = []
         for arg in self.args:

@@ -4,7 +4,7 @@ from jaclang.parser.expression import ValueFactory
 from jaclang.parser.root import RootFactory
 
 # modules
-from jaclang.parser import if_statement
+from jaclang.parser import if_statement, while_statement
 from jaclang.parser import integer
 from jaclang.parser import function
 from jaclang.parser import scope
@@ -12,6 +12,7 @@ from jaclang.parser import variable
 from jaclang.parser import expression
 
 
+while_statement.load()
 if_statement.load()
 integer.load()
 function.load()
